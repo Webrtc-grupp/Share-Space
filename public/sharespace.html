@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="main.css" type="text/css" />
+    <script
+      src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+      integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+      crossorigin="anonymous"
+    ></script>
+    <title>ShareSpace</title>
+  </head>
+  <body>
+    <section id="modal" class="CLOSED modal container-centered-centered">
+      <div class="wrapper">
+        <label for="username">
+          <h2>Choose a username</h2>
+        </label>
+        <hr class="line" />
+        <input
+          type="text"
+          name="username"
+          id="input-username"
+          placeholder="StreamerCat1689"
+          autocomplete="false"
+        />
+        <div>
+          <input
+            type="checkbox"
+            name="ask-again"
+            id="ask-again"
+            autocomplete="false"
+          />
+          <label for="ask-again">Don't ask again</label>
+        </div>
+        <button class="button blue full-width font-medium" id="button-continue">
+          Continue
+        </button>
+      </div>
+    </section>
+    <section class="container-flex-row screen">
+      <div class="video-container video-container-flex-column">
+        <svg viewBox="0 0 100 80" width="40" height="40">
+          <rect width="80" height="10" rx="8"></rect>
+          <rect y="20" width="80" height="10" rx="8"></rect>
+          <rect y="40" width="80" height="10" rx="8"></rect>
+        </svg>
+        <div class="video-wrapper-center">
+          <div id="link-wrapper">
+            <p>Click to copy link</p>
+            <p id="copy-link">Ersätter detta med url adressen via js</p>
+          </div>
+
+          <video
+            src="https://ia802509.us.archive.org/8/items/the-ren-and-stimpy-show-s-01e-05-space-madness/The%20Ren%20and%20Stimpy%20Show%20-%20s01e05%20-%20Space%20Madness.ia.mp4"
+            autoplay
+            muted
+            id="video"
+            loop
+            controls
+          ></video>
+          <button class="button share-btn red">Share Screen</button>
+        </div>
+      </div>
+      <div id="side-panel" class="container-flex-column">
+        <div id="panel-header">
+          <h2>Participants</h2>
+          <hr class="line" />
+        </div>
+        <div id="participants" class="container-flex-column">
+          <div id="bobbysId" class="container-flex-row participant">
+            <div class="avatar">👩‍⚕️</div>
+            <p>Bobby</p>
+          </div>
+          <div id="yvonsId" class="container-flex-row participant">
+            <div class="avatar">👩‍⚕️</div>
+            <p>Yvon</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script src="main.js" type="module"></script>
+  </body>
+</html>

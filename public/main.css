@@ -168,6 +168,9 @@ input[type="text"]:focus {
 
 .modal.OPEN {
   display: flex;
+  position: absolute;
+  z-index: 100;
+  background-color: var(--background-color);
 }
 
 .modal.CLOSED {

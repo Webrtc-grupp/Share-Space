@@ -224,6 +224,21 @@ svg:hover {
   max-width: 150px;
   font-size: var(--font-size-small);
 }
+
+.share-btn.HIDDEN {
+  display: none;
+}
+
 .red {
   background-color: var(--red);
+}
+
+#copy-link {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hostEl {
+  font-weight: 600;
+  color: var(--blue);
 }

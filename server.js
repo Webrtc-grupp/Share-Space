@@ -34,34 +34,60 @@ io.on("connection", (socket) => {
 
     const socketIdsInRoom = [...socket.adapter.rooms.get(roomId)];
 
-    const membersInRoom = [];
+    if (socketIdsInRoom.length === 1) {
+      socket.host = true;
+      socket.emit("isHost", true);
+    }
 
-    socketIdsInRoom.forEach(id => {
-      const member = { socketId: id };
-      const memberSocket = io.sockets.sockets.get(id);
-      
-      if (memberSocket.username) {
-        member.username = memberSocket.username;
-        membersInRoom.push(member);
+    const participantsInRoom = [];
+
+    socketIdsInRoom.forEach((id) => {
+      const participant = { socketId: id, isHost: false };
+      const participantSocket = io.sockets.sockets.get(id);
+
+      if (participantSocket.username) {
+        participant.username = participantSocket.username;
+        if (participantSocket.host) participant.isHost = true;
+        participantsInRoom.push(participant);
       }
-      
-    })
+    });
 
-    io.to(roomId).emit("members", membersInRoom);
+    io.to(roomId).emit("participants", participantsInRoom);
   });
 });
 
 io.of("/").adapter.on("leave-room", (room, id) => {
   if (id === room) return;
   console.log(id, " left room ", room);
-  const socketsStillInRoom = [...io.sockets.adapter.rooms.get(room)];
+  const socketIdsInRoom = [...io.sockets.adapter.rooms.get(room)];
 
-  if (socketsStillInRoom.length === 0) return;
+  const participantsInRoom = [];
+
+  const participantThatLeft = io.sockets.sockets.get(id);
+
+  if (participantThatLeft.host)
+    io.to(room).emit(
+      "hostLeft",
+      `Host ${participantThatLeft.username} ended the session`
+    );
+
+  socketIdsInRoom.forEach((id) => {
+    const participant = { socketId: id, isHost: false };
+    const participantSocket = io.sockets.sockets.get(id);
+
+    if (participantSocket.username) {
+      participant.username = participantSocket.username;
+      if (participantSocket.host) participant.isHost = true;
+      participantsInRoom.push(participant);
+    }
+  });
+
+  if (socketIdsInRoom.length === 0) return;
   console.log(
     "🚀 ~ file: server.js:58 ~ io.of ~ socketsStillInRoom:",
-    socketsStillInRoom
+    socketIdsInRoom
   );
-  io.to(room).emit("members", socketsStillInRoom);
+  io.to(room).emit("participants", participantsInRoom);
 });
 
 server.listen(PORT, () => {

@@ -5,12 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="main.css" type="text/css" />
-    <script
+    <!-- <script
       type="text/javascript"
-      src="js/sharespace.js"
+      src="js/utils.js"
       type="module"
       defer
-    ></script>
+      ></script> -->
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.11.1/qs.min.js"
       integrity="sha512-5Zv/hNtOKSkeScnIYOqGjng82gQSHsCoyqq9TgrJLgYa032cUYWH4kF1ayS8Gz1Jfge7e8MaBF6AeEvoQ92v8w=="
@@ -25,6 +25,12 @@
     <title>ShareSpace</title>
   </head>
   <body>
+    <script
+      type="text/javascript"
+      src="js/sharespace.js"
+      type="module"
+      defer
+    ></script>
     <section id="modal" class="OPEN modal container-centered-centered">
       <div class="wrapper">
         <label for="username">
@@ -58,7 +64,6 @@
         <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
         <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
         <svg
-
           fill="#000000"
           version="1.1"
           id="userMenu"
@@ -88,7 +93,7 @@
         </svg>
         <div class="video-wrapper-center">
           <div id="link-wrapper">
-            <p>Click to copy link</p>
+            <p id="copyMessage">Click to copy link</p>
             <p id="copy-link">Ersätter detta med url adressen via js</p>
           </div>
 
@@ -100,7 +105,9 @@
             loop
             controls
           ></video>
-          <button class="button share-btn red">Share Screen</button>
+          <button id="share-btn" class="HIDDEN button share-btn red">
+            Share Screen
+          </button>
         </div>
       </div>
       <div id="side-panel" class="container-flex-column">

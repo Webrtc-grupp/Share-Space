@@ -1,7 +1,7 @@
 const makeRoom = document.getElementById("make-room-btn");
 
 async function getRoom() {
-  const response = await fetch(" http://localhost:3000/room");
+  const response = await fetch("/room");
   const { id } = await response.json();
   if (!id) return console.error("No id provided by server");
 

@@ -53,6 +53,17 @@ io.on("connection", (socket) => {
     });
 
     io.to(roomId).emit("participants", participantsInRoom);
+
+    socket.on("offer", (payload) => {
+      io.to(payload.target).emit("offer", payload);
+      console.log(payload);
+    });
+    socket.on("answer", (payload) => {
+      io.to(payload.target).emit("answer", payload);
+    });
+    socket.on("candidate", (payload) => {
+      io.to(payload.target).emit("candidate", payload);
+    });
   });
 });
 

@@ -22,9 +22,3 @@ export function copyURL() {
       });
   };
 }
-
-function test() {
-  console.log("asdasdad");
-}
-
-module.exports = { test };

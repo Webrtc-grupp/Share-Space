@@ -1,3 +1,4 @@
+import { test } from "./utils.js";
 const socket = io();
 const STATE = {
   mySocketId: "",

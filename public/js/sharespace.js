@@ -7,6 +7,7 @@ import {
   handleOffer,
   handleAnswer,
   handleCandidate,
+  handleParticipantViewing
 } from "./utils.js";
 export const socket = io();
 export const STATE = {
@@ -26,6 +27,7 @@ const remember = document.getElementById("ask-again");
 const userMenu = document.getElementById("userMenu");
 const video = document.getElementById("video");
 const shareButton = document.getElementById("share-btn");
+let isScreensharing = false;
 
 export const servers = {
   iceServers: [
@@ -57,8 +59,6 @@ function joinRoom() {
   }
 }
 
-
-
 function init() {
   getStoredUsername();
   if (STATE.myUsername) {
@@ -76,9 +76,14 @@ async function shareScreen() {
       .then((stream) => {
         STATE.localStream = stream;
         video.srcObject = STATE.localStream;
+        isScreensharing = true;
+        shareButton.innerHTML = "stop sharing";
         STATE.participants.map((participant) => {
           if (participant.pc)
             STATE.localStream.getTracks().forEach((track) => {
+              track.addEventListener("ended", () =>
+                handleStopScreenShare(participant.socketId)
+              );
               participant.pc.addTrack(track, STATE.localStream);
             });
 
@@ -93,6 +98,37 @@ async function shareScreen() {
       });
   }
 }
+function stopSharing() {
+  if (STATE.localStream) {
+    STATE.localStream.getTracks()[0].stop();
+    console.log(STATE.localStream.getTracks()[0]);
+    STATE.localStream = null;
+    video.srcObject = null;
+    shareButton.innerHTML = "Share Screen";
+
+    STATE.participants.map((participant) => {
+      socket.emit("shareEnded", { target: participant.socketId });
+    });
+  }
+  isScreensharing = false;
+}
+function handleStopScreenShare(socketId) {
+  if (STATE.isHost) {
+    video.srcObject = null;
+    shareButton.innerHTML = "Share Screen";
+    isScreensharing = false;
+  }
+  if (socketId) {
+    socket.emit("shareEnded", { target: socketId });
+  }
+}
+
+function handleShareEnded() {
+  console.log("Share Ended");
+  const target = STATE.participants.find(participant => participant.isHost).socketId
+  socket.emit("viewing", { target, sender: STATE.mySocketId, viewing: false });
+  video.srcObject = null;
+}
 
 function handleHostLeft(msg) {
   alert(msg);
@@ -100,7 +136,13 @@ function handleHostLeft(msg) {
 }
 
 //EventListeners
-shareButton.onclick = () => shareScreen();
+shareButton.onclick = () => {
+  if (!isScreensharing) {
+    shareScreen();
+    return;
+  }
+  stopSharing();
+};
 
 continueBtn.onclick = () => {
   const value = username.value;
@@ -137,6 +179,8 @@ socket.on("hostLeft", (msg) => handleHostLeft(msg));
 socket.on("offer", (offer) => handleOffer(offer));
 socket.on("answer", (answer) => handleAnswer(answer));
 socket.on("candidate", (candidate) => handleCandidate(candidate));
+socket.on("shareEnded", () => handleShareEnded());
+socket.on("viewing", (payload) => handleParticipantViewing(payload))
 socket.on("error", (error) => handleError(error));
 
 init();

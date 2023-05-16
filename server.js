@@ -64,6 +64,14 @@ io.on("connection", (socket) => {
     socket.on("candidate", (payload) => {
       io.to(payload.target).emit("candidate", payload);
     });
+    socket.on("shareEnded", (payload) => {
+      io.to(payload.target).emit("shareEnded", payload);
+    });
+    socket.on("viewing", (payload) => {
+      socket.viewing = payload.viewing;
+      console.log(payload);
+      io.to(payload.target).emit("viewing", payload);
+    });
   });
 });
 

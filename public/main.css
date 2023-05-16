@@ -59,6 +59,13 @@ body {
   color: var(--dark-gray);
 }
 
+.eye.HIDDEN{
+  display: none;
+}
+.eye.OPEN{
+  display: block;
+}
+
 .container-centered-centered {
   width: 100vw;
   height: 100vh;

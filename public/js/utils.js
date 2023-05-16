@@ -83,6 +83,7 @@ function updateParticipantsList(participants) {
     const participantContainer = document.createElement("div");
     participantContainer.classList.add("container-flex-row");
     participantContainer.classList.add("participant");
+    participantContainer.id = participant.socketId;
 
     const usernameEl = document.createElement("p");
     const hostEl = document.createElement("p");
@@ -96,8 +97,14 @@ function updateParticipantsList(participants) {
     avatar.classList.add("avatar");
     avatar.innerHTML = "👨‍⚕️";
 
+    const eye = document.createElement("div");
+    eye.classList.add("HIDDEN");
+    eye.classList.add("eye");
+    eye.innerHTML = "👁";
+
     participantContainer.appendChild(avatar);
     participantContainer.appendChild(usernameEl);
+    participantContainer.appendChild(eye);
     if (participant.isHost) participantContainer.appendChild(hostEl);
     parentDiv.appendChild(participantContainer);
   });
@@ -148,6 +155,11 @@ function createParticipantPeerConnection(participant) {
     );
     if (event.streams[0]) {
       document.getElementById("video").srcObject = event.streams[0];
+      socket.emit("viewing", {
+        target: participant.socketId,
+        sender: STATE.mySocketId,
+        viewing: true,
+      });
     }
   };
   console.log(participant.pc);
@@ -257,4 +269,28 @@ function findTargetPC(target) {
   );
   if (match.pc) return match.pc;
   console.log("Could not find participant PC");
+}
+
+export function handleParticipantViewing({ sender, viewing }) {
+  console.log(
+    "🚀 ~ file: utils.js:271 ~ handleParticipantViewing ~ sender, viewing:",
+    sender,
+    viewing
+  );
+
+  const participantContainer = document.getElementById(sender);
+  // const eyeElement = participantContainer.children.find(child =>
+  // child.classList.contains(className));
+  const eyeElement = participantContainer.querySelector(".eye");
+  if (viewing && eyeElement) {
+    eyeElement.classList.remove("HIDDEN");
+    eyeElement.classList.add("OPEN");
+    return;
+  }
+  if (!viewing && eyeElement) {
+    eyeElement.classList.add("HIDDEN");
+    eyeElement.classList.remove("OPEN");
+
+    return;
+  }
 }

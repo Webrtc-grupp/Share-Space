@@ -57,28 +57,7 @@ function joinRoom() {
   }
 }
 
-function createPcParticipent() {
-  STATE.participants.map((participant) => {
-    if (participant.socketId === STATE.mySocketId) return;
-    if (STATE.isHost) return createParticipantPeerconnection(participant);
-    if (participant.isHost) return createParticipantConnection(participant);
-  });
-}
 
-function createParticipantPeerConnection(participant) {
-  const peerConnection = new RTCPeerConnection(servers);
-  participant.pc = peerConnection;
-  console.log(participant);
-  if (STATE.localStream) {
-    STATE.localStream.getTracks().forEach((track) => {
-      peerConnection.addTracks(track, STATE.localStream);
-    });
-  }
-
-  peerConnection.onnegotiationneeded = () => {
-    if (STATE.isHost) createOffer(participant);
-  };
-}
 
 function init() {
   getStoredUsername();

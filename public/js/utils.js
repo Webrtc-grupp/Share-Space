@@ -156,13 +156,34 @@ function createParticipantPeerConnection(participant) {
       "🚀 ~ file: utils.js:130 ~ peerConnection.ontrack ~ event:",
       event
     );
-    if (event.streams[0]) {
+    console.log(
+      "🚀 ~ file: utils.js:160 ~ createParticipantPeerConnection ~ event.streams[0]:",
+      event.streams[0]
+    );
+    if (event.streams[0].active) {
       document.getElementById("video").srcObject = event.streams[0];
-      socket.emit("viewing", {
+      const video = document.getElementById("video");
+      setTimeout(() => {
+        if (video.readyState === 4) {
+          socket.emit("viewing", {
+            target: participant.socketId,
+            sender: STATE.mySocketId,
+            viewing: true,
+          });
+        }
+      }, 3000);
+    }
+  };
+
+  participant.pc.oniceconnectionstatechange = function (event) {
+    console.log("event", event);
+    if (event.srcElement.connectionState === "failed") {
+      socket.emit("error", {
         target: participant.socketId,
-        sender: STATE.mySocketId,
-        viewing: true,
+        msg: "WebRTC connection failed",
       });
+      // Display an alert when WebRTC fails
+      alert("WebRTC connection failed!");
     }
   };
   console.log(participant.pc);

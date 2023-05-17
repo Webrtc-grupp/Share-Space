@@ -231,6 +231,7 @@ svg:hover {
 video::-webkit-media-controls-panel {
   opacity: 0;
 }
+
 video::-webkit-media-controls-panel:hover {
   opacity: 1;
 }
@@ -239,6 +240,10 @@ video::-webkit-media-controls-panel:hover {
   width: 100%;
   max-width: 150px;
   font-size: var(--font-size-small);
+}
+
+.button:disabled {
+  filter: grayscale();
 }
 
 .share-btn.HIDDEN {

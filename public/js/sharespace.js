@@ -98,6 +98,7 @@ async function shareScreen() {
       });
   }
 }
+
 function stopSharing() {
   if (STATE.localStream) {
     STATE.localStream.getTracks()[0].stop();
@@ -170,6 +171,10 @@ continueBtn.onclick = () => {
 };
 
 userMenu.onclick = () => openUserMeny();
+
+function handleError(error) {
+  alert(error.msg);
+}
 
 //Socket listeners
 socket.on("socketId", (id) => {

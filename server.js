@@ -72,6 +72,10 @@ io.on("connection", (socket) => {
       console.log(payload);
       io.to(payload.target).emit("viewing", payload);
     });
+    socket.on("error", (payload) => {
+      socket.error = payload.error;
+      io.to(payload.target).emit("error", payload);
+    });
   });
 });
 

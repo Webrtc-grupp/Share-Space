@@ -7,7 +7,7 @@ import {
   handleOffer,
   handleAnswer,
   handleCandidate,
-  handleParticipantViewing
+  handleParticipantViewing,
 } from "./utils.js";
 export const socket = io();
 export const STATE = {
@@ -21,9 +21,9 @@ export const STATE = {
 const { id: roomId } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
-const username = document.getElementById("input-username");
+export const username = document.getElementById("input-username");
+export const remember = document.getElementById("ask-again");
 const continueBtn = document.getElementById("button-continue");
-const remember = document.getElementById("ask-again");
 const userMenu = document.getElementById("userMenu");
 const video = document.getElementById("video");
 const shareButton = document.getElementById("share-btn");
@@ -125,7 +125,9 @@ function handleStopScreenShare(socketId) {
 
 function handleShareEnded() {
   console.log("Share Ended");
-  const target = STATE.participants.find(participant => participant.isHost).socketId
+  const target = STATE.participants.find(
+    (participant) => participant.isHost
+  ).socketId;
   socket.emit("viewing", { target, sender: STATE.mySocketId, viewing: false });
   video.srcObject = null;
 }
@@ -180,7 +182,7 @@ socket.on("offer", (offer) => handleOffer(offer));
 socket.on("answer", (answer) => handleAnswer(answer));
 socket.on("candidate", (candidate) => handleCandidate(candidate));
 socket.on("shareEnded", () => handleShareEnded());
-socket.on("viewing", (payload) => handleParticipantViewing(payload))
+socket.on("viewing", (payload) => handleParticipantViewing(payload));
 socket.on("error", (error) => handleError(error));
 
 init();

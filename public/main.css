@@ -59,10 +59,10 @@ body {
   color: var(--dark-gray);
 }
 
-.eye.HIDDEN{
+.eye.HIDDEN {
   display: none;
 }
-.eye.OPEN{
+.eye.OPEN {
   display: block;
 }
 
@@ -223,7 +223,16 @@ svg:hover {
 
 #video {
   height: clamp(100px, 40vh, 1920px);
-  background-color: var(--light-gray);
+  /* background-color: var(--light-gray); */
+  border: none;
+  outline: 0;
+}
+
+video::-webkit-media-controls-panel {
+  opacity: 0;
+}
+video::-webkit-media-controls-panel:hover {
+  opacity: 1;
 }
 
 .share-btn {

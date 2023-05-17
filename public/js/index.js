@@ -8,4 +8,9 @@ async function getRoom() {
   window.location.href = `sharespace.html?id=${id}`;
 }
 
+const canShare = navigator.mediaDevices.getDisplayMedia ? true : false;
+
+if (!canShare) alert("Your device does not support screen sharing.");
+if (!canShare) makeRoom.disabled = true;
+
 makeRoom.onclick = () => getRoom();

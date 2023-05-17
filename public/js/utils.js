@@ -1,4 +1,4 @@
-import { STATE, servers, socket } from "./sharespace.js";
+import { STATE, remember, servers, socket, username } from "./sharespace.js";
 const modal = document.getElementById("modal");
 
 export function copyURL() {
@@ -40,6 +40,9 @@ export function getStoredUsername() {
 export function openUserMeny() {
   modal.classList.remove("CLOSED");
   modal.classList.add("OPEN");
+  username.value = STATE.myUsername;
+  const saved = localStorage.getItem("_SP_username");
+  remember.checked = saved ? true : false;
 }
 
 export function handleParticipants(participants) {

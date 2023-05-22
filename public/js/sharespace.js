@@ -16,6 +16,7 @@ export const STATE = {
   participants: [],
   localStream: null,
   isHost: false,
+  sidePanel: false,
 };
 //hämtar room id från url:en och skickar den till backend
 const { id: roomId } = Qs.parse(location.search, {
@@ -27,6 +28,12 @@ const continueBtn = document.getElementById("button-continue");
 const userMenu = document.getElementById("userMenu");
 const video = document.getElementById("video");
 const shareButton = document.getElementById("share-btn");
+const sidePanel = document.getElementById("side-panel");
+const sidePanelBtn = document.getElementById("side-panel-btn");
+const panelheader = document.getElementById("panel-header");
+const panelPart = document.getElementById("participants");
+
+
 let isScreensharing = false;
 
 export const servers = {
@@ -131,12 +138,44 @@ function handleShareEnded() {
   ).socketId;
   socket.emit("viewing", { target, sender: STATE.mySocketId, viewing: false });
   video.srcObject = null;
+  video.controls = false;
 }
 
 function handleHostLeft(msg) {
   alert(msg);
   window.location.href = "index.html";
 }
+
+function showSidePanel() {
+  sidePanel.classList.remove("CLOSED");
+  sidePanel.classList.add("OPEN");
+  sidePanelBtn.classList.remove("CLOSED");
+  sidePanelBtn.classList.add("OPEN");
+  panelheader.classList.remove("CLOSED");
+  panelheader.classList.add("OPEN")
+  panelPart.classList.remove("CLOSED");
+  panelPart.classList.add("OPEN")
+  STATE.sidePanel = true;
+}
+function hideSidePanel() {
+  sidePanel.classList.remove("OPEN");
+  sidePanel.classList.add("CLOSED");
+  sidePanelBtn.classList.remove("OPEN");
+  sidePanelBtn.classList.add("CLOSED");
+  panelheader.classList.remove("OPEN");
+  panelheader.classList.add("CLOSED")
+  panelPart.classList.remove("OPEN");
+  panelPart.classList.add("CLOSED")
+  STATE.sidePanel = false;
+}
+
+sidePanelBtn.onclick = () => {
+  if (STATE.sidePanel) {
+    hideSidePanel();
+  } else {
+    showSidePanel();
+  }
+};
 
 //EventListeners
 shareButton.onclick = () => {

@@ -1,29 +1,51 @@
 import { STATE, remember, servers, socket, username } from "./sharespace.js";
 const modal = document.getElementById("modal");
 
-export function copyURL() {
-  const url = window.location.href;
-  const copyURLElement = document.getElementById("copy-link");
-  const copyURLMessage = document.getElementById("copyMessage");
-  copyURLElement.innerHTML = url;
+const url = window.location.href;
+const copyURLElement = document.getElementById("copy-link");
+const copyURLMessage = document.getElementById("copyMessage");
+const copyBtn = document.getElementById("copy-btn");
+copyURLElement.innerHTML = url;
 
-  copyURLElement.onclick = () => {
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        copyURLMessage.innerHTML = "URL copied to clipboard 😍";
-        setTimeout(() => {
-          copyURLMessage.innerHTML = "Click to copy link";
-        }, 2000);
-      })
-      .catch((error) => {
-        copyURLMessage.innerHTML = error;
-        setTimeout(() => {
-          copyURLMessage.innerHTML = "Click to copy link";
-        }, 2000);
-      });
-  };
+export function copyURL() {
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+
+      copyURLMessage.innerHTML = "URL copied to clipboard 😍";
+      setTimeout(() => {
+        copyURLMessage.innerHTML = "Click to copy link";
+      }, 2000);
+    })
+    .catch((error) => {
+      copyURLMessage.innerHTML = error;
+      setTimeout(() => {
+        copyURLMessage.innerHTML = "Click to copy link";
+      }, 2000);
+    });
 }
+
+function copyByBtn(){
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+     
+      copyBtn.innerHTML = "URL copied to clipboard 😍";
+      setTimeout(() => {
+        copyBtn.innerHTML = "Copy link";
+      }, 2000);
+    })
+    .catch((error) => {
+      copyBtn.innerHTML = error;
+      setTimeout(() => {
+        copyBtn.innerHTML = "Click to copy link";
+      }, 2000);
+    });
+}
+
+copyURLElement.onclick = () => copyURL();
+copyBtn.onclick = () => copyByBtn();
+
 export function getStoredUsername() {
   try {
     const storedName = localStorage.getItem("_SP_username");
@@ -165,6 +187,7 @@ function createParticipantPeerConnection(participant) {
       const video = document.getElementById("video");
       setTimeout(() => {
         if (video.readyState === 4) {
+          video.controls = true;
           socket.emit("viewing", {
             target: participant.socketId,
             sender: STATE.mySocketId,

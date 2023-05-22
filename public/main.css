@@ -21,8 +21,12 @@ body {
   background-color: var(--background-color);
   font-family: -apple-system, "Segoe UI", Helvetica, sans-serif;
   margin: 0;
+  overflow: hidden;
 }
 
+.logo {
+  width: 250px;
+}
 .index__nav-headline {
   font-size: var(--font-size-big);
   margin: 0;
@@ -104,6 +108,7 @@ body {
 
 #participants {
   gap: 16px;
+  overflow-y: scroll;
 }
 
 .avatar {
@@ -197,8 +202,15 @@ svg:hover {
   transition: 0.3s;
 }
 
+#side-panel-btn {
+  display: none;
+}
+
 #link-wrapper {
   background-color: #fff;
+}
+#copy-btn {
+  display: none;
 }
 
 .video-wrapper-center {
@@ -262,4 +274,116 @@ video::-webkit-media-controls-panel:hover {
 .hostEl {
   font-weight: 600;
   color: var(--blue);
+}
+
+@media (max-width: 760px) {
+  #main {
+    display: flex;
+    flex-direction: column;
+  }
+  .video-wrapper-center {
+    padding: 0;
+  }
+  #side-panel {
+    height: 100vh;
+    max-width: none;
+    border: 0;
+    transform: translateY(94%);
+    border-top: 1px solid var(--dark-gray);
+    position: absolute;
+    width: 100%;
+  }
+  #video {
+    height: auto;
+  }
+  #side-panel-btn {
+    width: 20px;
+    height: 20px;
+    font-size: var(--font-size-big);
+    margin: 0 auto;
+    /* transform: translateY(calc(-50% - var(--font-size-big) / 2)); */
+    line-height: 1;
+    display: block;
+  }
+
+  #side-panel.OPEN {
+    animation: slideUp ease-in-out 0.8s forwards;
+  }
+
+  #side-panel.CLOSED {
+    animation: slideDown ease-in-out 0.8s forwards;
+  }
+
+  #side-panel-btn.OPEN {
+    transform: rotate(180deg);
+  }
+
+  #side-panel-btn.CLOSED {
+    transform: rotate(0deg);
+  }
+
+  #panel-header.OPEN{
+    display: flex;
+  }
+  
+  #panel-header.CLOSED{
+    display: none;
+  }
+  
+  #panel-header {
+    margin: 0;
+    gap: 0;
+  }
+
+  #participants.OPEN{
+    display: flex;
+  }
+
+  #participants.CLOSED{
+    display: none;
+  }
+
+  .video-container-flex-column {
+    align-items: start;
+  }
+  svg {
+    position: static;
+  }
+  .share-btn {
+    width: auto;
+    max-width: none;
+    margin: 0 20px;
+  }
+  #copy-link {
+    display: none;
+  }
+  #copy-btn {
+    display: block;
+  }
+  #copy-btn:hover {
+    filter: invert(0);
+  }
+  #copyMessage {
+    display: none;
+  }
+ 
+  
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(94%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0%);
+  }
+  to {
+    transform: translateY(94%);
+  }
 }

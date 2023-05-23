@@ -1,51 +1,14 @@
 import { STATE, remember, servers, socket, username } from "./sharespace.js";
-const modal = document.getElementById("modal");
 
+//DOM Elements
+const modal = document.getElementById("modal");
 const url = window.location.href;
 const copyURLElement = document.getElementById("copy-link");
 const copyURLMessage = document.getElementById("copyMessage");
 const copyBtn = document.getElementById("copy-btn");
 copyURLElement.innerHTML = url;
 
-export function copyURL() {
-  navigator.clipboard
-    .writeText(url)
-    .then(() => {
-
-      copyURLMessage.innerHTML = "URL copied to clipboard 😍";
-      setTimeout(() => {
-        copyURLMessage.innerHTML = "Click to copy link";
-      }, 2000);
-    })
-    .catch((error) => {
-      copyURLMessage.innerHTML = error;
-      setTimeout(() => {
-        copyURLMessage.innerHTML = "Click to copy link";
-      }, 2000);
-    });
-}
-
-function copyByBtn(){
-  navigator.clipboard
-    .writeText(url)
-    .then(() => {
-     
-      copyBtn.innerHTML = "URL copied to clipboard 😍";
-      setTimeout(() => {
-        copyBtn.innerHTML = "Copy link";
-      }, 2000);
-    })
-    .catch((error) => {
-      copyBtn.innerHTML = error;
-      setTimeout(() => {
-        copyBtn.innerHTML = "Click to copy link";
-      }, 2000);
-    });
-}
-
-copyURLElement.onclick = () => copyURL();
-copyBtn.onclick = () => copyByBtn();
-
+//Functions
 export function getStoredUsername() {
   try {
     const storedName = localStorage.getItem("_SP_username");
@@ -341,3 +304,41 @@ export function handleParticipantViewing({ sender, viewing }) {
     return;
   }
 }
+
+export function copyURL() {
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      copyURLMessage.innerHTML = "URL copied to clipboard 😍";
+      setTimeout(() => {
+        copyURLMessage.innerHTML = "Click to copy link";
+      }, 2000);
+    })
+    .catch((error) => {
+      copyURLMessage.innerHTML = error;
+      setTimeout(() => {
+        copyURLMessage.innerHTML = "Click to copy link";
+      }, 2000);
+    });
+}
+
+function copyByBtn() {
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      copyBtn.innerHTML = "URL copied to clipboard 😍";
+      setTimeout(() => {
+        copyBtn.innerHTML = "Copy link";
+      }, 2000);
+    })
+    .catch((error) => {
+      copyBtn.innerHTML = error;
+      setTimeout(() => {
+        copyBtn.innerHTML = "Click to copy link";
+      }, 2000);
+    });
+}
+
+//Event listeners
+copyURLElement.onclick = () => copyURL();
+copyBtn.onclick = () => copyByBtn();

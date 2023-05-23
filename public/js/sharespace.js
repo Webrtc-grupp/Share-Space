@@ -9,6 +9,8 @@ import {
   handleCandidate,
   handleParticipantViewing,
 } from "./utils.js";
+
+//Variables
 export const socket = io();
 export const STATE = {
   mySocketId: "",
@@ -17,11 +19,25 @@ export const STATE = {
   localStream: null,
   isHost: false,
   sidePanel: false,
+  isScreensharing: false,
 };
-//hämtar room id från url:en och skickar den till backend
 const { id: roomId } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
+export const servers = {
+  iceServers: [
+    {
+      urls: "stun:a.relay.metered.ca:80",
+    },
+    {
+      urls: "turn:a.relay.metered.ca:80",
+      username: "f6de8d4b9f7bd1de1408b8f3",
+      credential: "FAZrFTuBsCxg3KxA",
+    },
+  ],
+};
+
+//DOM elements
 export const username = document.getElementById("input-username");
 export const remember = document.getElementById("ask-again");
 const continueBtn = document.getElementById("button-continue");
@@ -33,46 +49,10 @@ const sidePanelBtn = document.getElementById("side-panel-btn");
 const panelheader = document.getElementById("panel-header");
 const panelPart = document.getElementById("participants");
 
-
-let isScreensharing = false;
-
-export const servers = {
-  iceServers: [
-    {
-      urls: "stun:a.relay.metered.ca:80",
-    },
-    {
-      urls: "turn:a.relay.metered.ca:80",
-      username: "f6de8d4b9f7bd1de1408b8f3",
-      credential: "FAZrFTuBsCxg3KxA",
-    },
-    // {
-    //   urls: "turn:a.relay.metered.ca:80?transport=tcp",
-    //   username: "f6de8d4b9f7bd1de1408b8f3",
-    //   credential: "FAZrFTuBsCxg3KxA",
-    // },
-    // {
-    //   urls: "turn:a.relay.metered.ca:443",
-    //   username: "f6de8d4b9f7bd1de1408b8f3",
-    //   credential: "FAZrFTuBsCxg3KxA",
-    // },
-  ],
-};
-////////////////////////////////functions //////////////////////////////////
-
+//Functions
 function joinRoom() {
   if (socket) {
     socket.emit("joinRoom", { username: STATE.myUsername, roomId });
-  }
-}
-
-function init() {
-  getStoredUsername();
-  if (STATE.myUsername) {
-    joinRoom();
-  }
-  if (roomId) {
-    copyURL();
   }
 }
 
@@ -83,8 +63,8 @@ async function shareScreen() {
       .then((stream) => {
         STATE.localStream = stream;
         video.srcObject = STATE.localStream;
-        isScreensharing = true;
-        shareButton.innerHTML = "stop sharing";
+        STATE.isScreensharing = true;
+        shareButton.innerHTML = "Stop sharing";
         STATE.participants.map((participant) => {
           if (participant.pc)
             STATE.localStream.getTracks().forEach((track) => {
@@ -118,13 +98,14 @@ function stopSharing() {
       socket.emit("shareEnded", { target: participant.socketId });
     });
   }
-  isScreensharing = false;
+  STATE.isScreensharing = false;
 }
+
 function handleStopScreenShare(socketId) {
   if (STATE.isHost) {
     video.srcObject = null;
     shareButton.innerHTML = "Share Screen";
-    isScreensharing = false;
+    STATE.isScreensharing = false;
   }
   if (socketId) {
     socket.emit("shareEnded", { target: socketId });
@@ -152,20 +133,21 @@ function showSidePanel() {
   sidePanelBtn.classList.remove("CLOSED");
   sidePanelBtn.classList.add("OPEN");
   panelheader.classList.remove("CLOSED");
-  panelheader.classList.add("OPEN")
+  panelheader.classList.add("OPEN");
   panelPart.classList.remove("CLOSED");
-  panelPart.classList.add("OPEN")
+  panelPart.classList.add("OPEN");
   STATE.sidePanel = true;
 }
+
 function hideSidePanel() {
   sidePanel.classList.remove("OPEN");
   sidePanel.classList.add("CLOSED");
   sidePanelBtn.classList.remove("OPEN");
   sidePanelBtn.classList.add("CLOSED");
   panelheader.classList.remove("OPEN");
-  panelheader.classList.add("CLOSED")
+  panelheader.classList.add("CLOSED");
   panelPart.classList.remove("OPEN");
-  panelPart.classList.add("CLOSED")
+  panelPart.classList.add("CLOSED");
   STATE.sidePanel = false;
 }
 
@@ -177,9 +159,20 @@ sidePanelBtn.onclick = () => {
   }
 };
 
+function handleError(error) {
+  alert(error.msg);
+}
+
+function init() {
+  getStoredUsername();
+  if (STATE.myUsername) {
+    joinRoom();
+  }
+}
+
 //EventListeners
 shareButton.onclick = () => {
-  if (!isScreensharing) {
+  if (!STATE.isScreensharing) {
     shareScreen();
     return;
   }
@@ -211,10 +204,6 @@ continueBtn.onclick = () => {
 
 userMenu.onclick = () => openUserMeny();
 
-function handleError(error) {
-  alert(error.msg);
-}
-
 //Socket listeners
 socket.on("socketId", (id) => {
   STATE.mySocketId = id;
@@ -229,4 +218,5 @@ socket.on("shareEnded", () => handleShareEnded());
 socket.on("viewing", (payload) => handleParticipantViewing(payload));
 socket.on("error", (error) => handleError(error));
 
+//Initial operations
 init();

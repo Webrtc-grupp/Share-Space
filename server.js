@@ -4,31 +4,34 @@ const http = require("http");
 const socket = require("socket.io");
 const { v1 } = require("uuid");
 
+//Server objects
 const app = express();
 const server = http.createServer(app);
 
+//Configuration
 const PORT = 3000;
 const socketServerOptions = {
   cors: true,
   origin: "*",
 };
 
+//Socket server
 const io = socket(server, socketServerOptions);
 
+//Express routing
 app.use(express.static(path.join(__dirname, "public")));
+
 app.get("/room", (req, res) => {
   const id = v1();
   res.send({ id: id });
 });
 
+//Event handlers socket server
 io.on("connection", (socket) => {
   console.log(socket.id, "Connected");
   socket.emit("socketId", socket.id);
 
-  //////////////////////////////////////  joinRoom ///////////////////////////////////////
-
   socket.on("joinRoom", ({ username, roomId }) => {
-    //HÄR SKALL VI LÄGGA TILL ATT USENAME SKICKAS MED
     socket.join(roomId);
     socket.username = username;
 
@@ -113,6 +116,7 @@ io.of("/").adapter.on("leave-room", (room, id) => {
   io.to(room).emit("participants", participantsInRoom);
 });
 
+//Server initialization
 server.listen(PORT, () => {
   console.log("Running on port ", PORT);
 });

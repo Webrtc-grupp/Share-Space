@@ -7,6 +7,7 @@
   --radius: 6px;
   --box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
   --font: -apple-system, "Segoe UI", Helvetica, sans-serif;
+  --font-size-xsmall: clamp(12px, 1.5vw, 14px);
   --font-size-small: clamp(16px, 1.5vw, 18px);
   --font-size-medium: clamp(18px, 1.5vw, 36px);
   --font-size-big: clamp(32px, 8vw, 65px);
@@ -24,16 +25,20 @@ body {
   overflow: hidden;
 }
 
-.font-large {
-  font-size: var(--font-size-big);
+.font-xsmall {
+  font-size: var(--font-size-xsmall);
+}
+
+.font-small {
+  font-size: var(--font-size-small);
 }
 
 .font-medium {
   font-size: var(--font-size-medium);
 }
 
-.font-small {
-  font-size: var(--font-size-small);
+.font-large {
+  font-size: var(--font-size-big);
 }
 
 .blue {
@@ -46,7 +51,7 @@ body {
 
 .line {
   width: 100%;
-  color: var(--dark-gray);
+  color: var(--light-gray);
 }
 
 .container-centered-centered {
@@ -125,22 +130,26 @@ body {
 }
 
 #side-panel {
-  flex-grow: 3;
+  flex-grow: 2;
   flex-basis: 0;
-  max-width: 300px;
+  max-width: 260px;
   gap: 8px;
-  padding: clamp(0px, 5%, 28px);
+  padding: clamp(0px, 5%, 10px);
   background-color: white;
-  border-left: 1px solid var(--dark-gray);
+  border-left: 1px solid var(--light-gray);
 }
 
 #panel-header {
   display: flex;
   text-align: center;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 62px;
+  /* gap: 1%; */
+  margin-top: 1vh;
   justify-content: space-evenly;
+}
+#panel-header h2 {
+  font-size: var(--font-size-small);
+  font-weight: 400;
 }
 
 #participants {
@@ -164,15 +173,25 @@ body {
   background-color: white;
   height: 36px;
   width: 36px;
+  max-width: 36px;
+  flex: 10% 1 0;
 }
 
 .participant {
   height: clamp(30px, 100%, 50px);
+  flex: 1 1 auto;
   align-items: center;
   background-color: var(--light-gray);
   border-radius: var(--radius);
   gap: 6px;
-  padding: clamp(2px, 100%, 8px);
+  padding-left: clamp(2px, 100%, 8px);
+}
+
+.participant p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 30% 1 0;
 }
 
 .wrapper {
@@ -223,6 +242,8 @@ svg:hover {
 
 #link-wrapper {
   background-color: #fff;
+  padding-left: 0.5rem;
+  border-radius: var(--radius);
 }
 
 #copy-btn {
@@ -230,7 +251,6 @@ svg:hover {
 }
 
 .video-wrapper-center {
-  /* max-width: 1440px; */
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -238,7 +258,6 @@ svg:hover {
   gap: 16px;
   padding: 0 36px;
   width: 100%;
-  /* align-items: center; */
 }
 
 .video-container-flex-column {
@@ -250,7 +269,10 @@ svg:hover {
 }
 
 #video {
-  height: clamp(100px, 40vh, 1920px);
+  margin-left: auto;
+  margin-right: auto;
+  width: clamp(240px, 50vw, 1920px);
+  height: clamp(240px, 50vh, 1080px);
   border: 1px solid var(--dark-gray);
   border-radius: var(--radius);
   outline: 0;

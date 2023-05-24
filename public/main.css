@@ -143,9 +143,13 @@ body {
   display: flex;
   text-align: center;
   flex-direction: column;
-  gap: 18px;
-  margin-top: 62px;
+  /* gap: 1%; */
+  margin-top: 1vh;
   justify-content: space-evenly;
+}
+#panel-header h2 {
+  font-size: var(--font-size-small);
+  font-weight: 400;
 }
 
 #participants {
@@ -239,6 +243,7 @@ svg:hover {
 #link-wrapper {
   background-color: #fff;
   padding-left: 0.5rem;
+  border-radius: var(--radius);
 }
 
 #copy-btn {
@@ -246,7 +251,6 @@ svg:hover {
 }
 
 .video-wrapper-center {
-  /* max-width: 1440px; */
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -254,7 +258,6 @@ svg:hover {
   gap: 16px;
   padding: 0 36px;
   width: 100%;
-  /* align-items: center; */
 }
 
 .video-container-flex-column {
@@ -266,7 +269,10 @@ svg:hover {
 }
 
 #video {
-  height: clamp(100px, 40vh, 1920px);
+  margin-left: auto;
+  margin-right: auto;
+  width: clamp(240px, 50vw, 1920px);
+  height: clamp(240px, 50vh, 1080px);
   border: 1px solid var(--dark-gray);
   border-radius: var(--radius);
   outline: 0;

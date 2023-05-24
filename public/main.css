@@ -194,7 +194,7 @@ input[type="text"]:focus {
 }
 
 svg {
-  left: 0;
+  left: 15px;
   position: absolute;
   margin: 20px;
   fill: var(--dark-gray);
@@ -251,7 +251,8 @@ svg:hover {
 
 #video {
   height: clamp(100px, 40vh, 1920px);
-  border: none;
+  border: 1px solid var(--dark-gray);
+  border-radius: var(--radius);
   outline: 0;
 }
 
@@ -296,7 +297,7 @@ video::-webkit-media-controls-panel:hover {
   }
 
   .video-wrapper-center {
-    padding: 0;
+    padding: 10px;
   }
 
   #side-panel {
@@ -369,7 +370,6 @@ video::-webkit-media-controls-panel:hover {
   .share-btn {
     width: auto;
     max-width: none;
-    margin: 0 20px;
   }
 
   #copy-link {

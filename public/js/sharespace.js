@@ -58,8 +58,8 @@ function joinRoom() {
 }
 
 function leaveRoom() {
-  if(STATE.isHost){
-    alert("Host" +  STATE.myUsername + " has ended the session")
+  if (STATE.isHost) {
+    socket.on("hostLeft", (msg) => alert(msg));
   }
   window.location.href = "index.html";
 }

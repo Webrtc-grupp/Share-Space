@@ -90,7 +90,7 @@ function updateParticipantsList(participants) {
     eye.classList.add("eye");
     eye.innerHTML = "👁";
 
-    if (participantContainer.socketId) {
+    if (participantContainer.id) {
       participantContainer.addEventListener("mouseover", () => {
         participantContainer.style.backgroundColor = "white";
         participantContainer.style.border = "1px solid #d9d9d9";

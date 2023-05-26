@@ -59,7 +59,7 @@ function joinRoom() {
 
 function leaveRoom() {
   if(STATE.isHost){
-    alert("Host" + STATE.myUsername + " has ended the session")
+    alert("Host" +  STATE.myUsername + " has ended the session")
   }
   window.location.href = "index.html";
 }

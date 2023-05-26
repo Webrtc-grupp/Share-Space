@@ -90,6 +90,18 @@ function updateParticipantsList(participants) {
     eye.classList.add("eye");
     eye.innerHTML = "👁";
 
+    if (participantContainer.id) {
+      participantContainer.addEventListener("mouseover", () => {
+        participantContainer.style.backgroundColor = "white";
+        participantContainer.style.border = "1px solid #d9d9d9";
+        participantContainer.style.cursor = "pointer";
+      });
+      participantContainer.addEventListener("mouseleave", () => {
+        participantContainer.style.backgroundColor = "#d9d9d9";
+      });
+      participantContainer.onclick = () => openUserMeny();
+    }
+
     participantContainer.appendChild(avatar);
     participantContainer.appendChild(usernameEl);
     participantContainer.appendChild(eye);
@@ -148,6 +160,7 @@ function createParticipantPeerConnection(participant) {
     if (event.streams[0].active) {
       document.getElementById("video").srcObject = event.streams[0];
       const video = document.getElementById("video");
+      video.style.backgroundColor = "white";
       setTimeout(() => {
         if (video.readyState === 4) {
           video.controls = true;

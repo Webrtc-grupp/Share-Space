@@ -41,19 +41,27 @@ export const servers = {
 export const username = document.getElementById("input-username");
 export const remember = document.getElementById("ask-again");
 const continueBtn = document.getElementById("button-continue");
-const userMenu = document.getElementById("userMenu");
+// const userMenu = document.getElementById("userMenu");
 const video = document.getElementById("video");
 const shareButton = document.getElementById("share-btn");
 const sidePanel = document.getElementById("side-panel");
 const sidePanelBtn = document.getElementById("side-panel-btn");
 const panelheader = document.getElementById("panel-header");
 const panelPart = document.getElementById("participants");
+const leave = document.getElementById("leave-room");
 
 //Functions
 function joinRoom() {
   if (socket) {
     socket.emit("joinRoom", { username: STATE.myUsername, roomId });
   }
+}
+
+function leaveRoom() {
+  if(STATE.isHost){
+    alert("Host" + STATE.myUsername + " has ended the session")
+  }
+  window.location.href = "index.html";
 }
 
 async function shareScreen() {
@@ -65,6 +73,7 @@ async function shareScreen() {
         video.srcObject = STATE.localStream;
         STATE.isScreensharing = true;
         shareButton.innerHTML = "Stop sharing";
+        video.style.backgroundColor = "white";
         STATE.participants.map((participant) => {
           if (participant.pc)
             STATE.localStream.getTracks().forEach((track) => {
@@ -171,6 +180,8 @@ function init() {
 }
 
 //EventListeners
+leave.onclick = () => leaveRoom();
+
 shareButton.onclick = () => {
   if (!STATE.isScreensharing) {
     shareScreen();
@@ -202,7 +213,7 @@ continueBtn.onclick = () => {
   }
 };
 
-userMenu.onclick = () => openUserMeny();
+// userMenu.onclick = () => openUserMeny();
 
 //Socket listeners
 socket.on("socketId", (id) => {

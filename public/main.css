@@ -204,19 +204,19 @@ input[type="text"] {
   padding: 10px;
   border-radius: var(--radius);
   border: 1px solid var(--dark-gray);
-  background-color: var(--background-color);
+  background-color: var(--light-gray);
 }
 
 input[type="text"]:focus {
   outline-color: var(--blue);
   outline-width: thin;
+  background-color: white;
 }
 
 svg {
-  left: 15px;
-  position: absolute;
-  margin: 20px;
+  margin-bottom: 20px;
   fill: var(--dark-gray);
+  transform: rotate(180deg);
 }
 
 svg:hover {
@@ -257,6 +257,7 @@ svg:hover {
   justify-content: center;
   gap: 16px;
   padding: 0 36px;
+  max-width: 2000px;
   width: 100%;
 }
 
@@ -271,11 +272,11 @@ svg:hover {
 #video {
   margin-left: auto;
   margin-right: auto;
-  width: clamp(240px, 50vw, 1920px);
   height: clamp(240px, 50vh, 1080px);
   border: 1px solid var(--dark-gray);
   border-radius: var(--radius);
   outline: 0;
+  width: 100%;
 }
 
 video::-webkit-media-controls-panel {
@@ -288,7 +289,7 @@ video::-webkit-media-controls-panel:hover {
 
 .share-btn {
   width: 100%;
-  max-width: 150px;
+  /* max-width: 150px; */
   font-size: var(--font-size-small);
 }
 
@@ -320,6 +321,7 @@ video::-webkit-media-controls-panel:hover {
 
   .video-wrapper-center {
     padding: 10px;
+    max-width: 100%;
   }
 
   #side-panel {

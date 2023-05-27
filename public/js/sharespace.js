@@ -8,6 +8,8 @@ import {
   handleAnswer,
   handleCandidate,
   handleParticipantViewing,
+  toggleFullScreen,
+  handleFullscreenChange,
 } from "./utils.js";
 
 //Variables
@@ -20,6 +22,7 @@ export const STATE = {
   isHost: false,
   sidePanel: false,
   isScreensharing: false,
+  fullscreen: false,
 };
 const { id: roomId } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
@@ -151,14 +154,6 @@ function hideSidePanel() {
   STATE.sidePanel = false;
 }
 
-sidePanelBtn.onclick = () => {
-  if (STATE.sidePanel) {
-    hideSidePanel();
-  } else {
-    showSidePanel();
-  }
-};
-
 function handleError(error) {
   alert(error.msg);
 }
@@ -171,6 +166,14 @@ function init() {
 }
 
 //EventListeners
+sidePanelBtn.onclick = () => {
+  if (STATE.sidePanel) {
+    hideSidePanel();
+  } else {
+    showSidePanel();
+  }
+};
+
 shareButton.onclick = () => {
   if (!STATE.isScreensharing) {
     shareScreen();
@@ -203,6 +206,8 @@ continueBtn.onclick = () => {
 };
 
 userMenu.onclick = () => openUserMeny();
+video.onclick = () => toggleFullScreen();
+document.addEventListener("fullscreenchange", (e) => handleFullscreenChange(e));
 
 //Socket listeners
 socket.on("socketId", (id) => {

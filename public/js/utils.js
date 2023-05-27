@@ -30,6 +30,17 @@ export function openUserMeny() {
   remember.checked = saved ? true : false;
 }
 
+export function toggleFullScreen() {
+  const video = document.getElementById("video");
+  if (!video) return;
+  if (STATE.fullscreen) document.exitFullscreen();
+  video.requestFullscreen({ navigationUI: "show" });
+}
+
+export function handleFullscreenChange(e) {
+  console.log("🚀 ~ file: utils.js:41 ~ handleFullscreenChange ~ e:", e);
+}
+
 export function handleParticipants(participants) {
   console.log(
     "🚀 ~ file: sharespace.js:77 ~ handleParticipants ~ participants:",

@@ -276,6 +276,11 @@ svg:hover {
   border: 1px solid var(--dark-gray);
   border-radius: var(--radius);
   outline: 0;
+  position: relative;
+}
+
+#video:hover {
+  cursor: move;
 }
 
 video::-webkit-media-controls-panel {

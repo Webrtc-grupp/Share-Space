@@ -1,12 +1,25 @@
-import { STATE, remember, servers, socket, username } from "./sharespace.js";
+import {
+  STATE,
+  remember,
+  servers,
+  socket,
+  username,
+  copyURLElement,
+  copyURLMessage,
+  copyBtn,
+  url,
+  shareButton,
+  sidePanel,
+  sidePanelBtn,
+  panelheader,
+  panelPart,
+} from "./sharespace.js";
 
-//DOM Elements
-const modal = document.getElementById("modal");
-const url = window.location.href;
-const copyURLElement = document.getElementById("copy-link");
-const copyURLMessage = document.getElementById("copyMessage");
-const copyBtn = document.getElementById("copy-btn");
-copyURLElement.innerHTML = url;
+//Variables
+
+const { id: roomId } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+});
 
 //Functions
 export function getStoredUsername() {
@@ -31,10 +44,13 @@ export function openUserMeny() {
 }
 
 export function toggleFullScreen() {
+  console.log("Toggle Full Screen");
   const video = document.getElementById("video");
   if (!video) return;
   if (STATE.fullscreen) document.exitFullscreen();
-  video.requestFullscreen({ navigationUI: "show" });
+  video
+    .requestFullscreen({ navigationUI: "show" })
+    .then(() => (STATE.fullscreen = true));
 }
 
 export function handleFullscreenChange(e) {
@@ -99,7 +115,12 @@ function updateParticipantsList(participants) {
     const eye = document.createElement("div");
     eye.classList.add("HIDDEN");
     eye.classList.add("eye");
-    eye.innerHTML = "👁";
+    eye.innerHTML = "Viewing";
+
+    if (participantContainer.id === STATE.mySocketId) {
+      participantContainer.classList.add("me");
+      participantContainer.onclick = () => openUserMeny();
+    }
 
     participantContainer.appendChild(avatar);
     participantContainer.appendChild(usernameEl);
@@ -159,9 +180,9 @@ function createParticipantPeerConnection(participant) {
     if (event.streams[0].active) {
       document.getElementById("video").srcObject = event.streams[0];
       const video = document.getElementById("video");
+      video.style.backgroundColor = "white";
       setTimeout(() => {
         if (video.readyState === 4) {
-          video.controls = true;
           socket.emit("viewing", {
             target: participant.socketId,
             sender: STATE.mySocketId,
@@ -207,6 +228,7 @@ function createPartOffer(participant) {
 
 export function handleIsHost(isHost) {
   const shareButton = document.getElementById("share-btn");
+  const info = document.getElementById("info");
   console.log(
     "🚀 ~ file: sharespace.js:131 ~ handleIsHosted ~ isHost:",
     isHost
@@ -214,6 +236,7 @@ export function handleIsHost(isHost) {
 
   if (isHost) {
     STATE.isHost = isHost;
+    info?.classList.add("HIDDEN");
     shareButton.classList.remove("HIDDEN");
   }
 }
@@ -333,7 +356,7 @@ export function copyURL() {
     });
 }
 
-function copyByBtn() {
+export function copyByBtn() {
   navigator.clipboard
     .writeText(url)
     .then(() => {
@@ -350,6 +373,117 @@ function copyByBtn() {
     });
 }
 
-//Event listeners
-copyURLElement.onclick = () => copyURL();
-copyBtn.onclick = () => copyByBtn();
+export function leaveRoom() {
+  window.location.href = "index.html";
+}
+
+export function handleError(error) {
+  alert(error.msg);
+}
+
+export function joinRoom() {
+  if (socket) {
+    socket.emit("joinRoom", { username: STATE.myUsername, roomId });
+  }
+}
+
+export function handleContinue() {
+  const value = username.value;
+  const dontaskagain = remember.checked;
+
+  if (value !== "" && value !== " ") {
+    STATE.myUsername = value;
+
+    modal.classList.remove("OPEN");
+    modal.classList.add("CLOSED");
+    joinRoom();
+
+    if (dontaskagain) {
+      localStorage.setItem("_SP_username", STATE.myUsername);
+    }
+    if (!dontaskagain) {
+      localStorage.removeItem("_SP_username");
+    }
+    console.log(STATE);
+  } else {
+    alert("please enter your name");
+  }
+}
+
+export async function shareScreen() {
+  if (STATE.isHost) {
+    await navigator.mediaDevices
+      .getDisplayMedia({ video: true, audio: true })
+      .then((stream) => {
+        STATE.localStream = stream;
+        video.srcObject = STATE.localStream;
+        STATE.isScreensharing = true;
+        shareButton.innerHTML = "Stop sharing";
+        STATE.participants.map((participant) => {
+          if (participant.pc)
+            STATE.localStream.getTracks().forEach((track) => {
+              track.addEventListener("removetrack", () => {
+                debugger;
+                handleStopScreenShare(participant.socketId);
+              });
+              participant.pc.addTrack(track, STATE.localStream);
+            });
+
+          console.log(
+            "🚀 ~ file: sharespace.js:101 ~ STATE.participants.map ~ participant:",
+            participant
+          );
+        });
+        setInterval(() => {
+          if (video.readyState === 2) stopSharing();
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+}
+
+export function stopSharing() {
+  if (STATE.localStream) {
+    STATE.localStream.getTracks()[0].stop();
+    console.log(STATE.localStream.getTracks()[0]);
+    STATE.localStream = null;
+    video.srcObject = null;
+    shareButton.innerHTML = "Share Screen";
+
+    STATE.participants.map((participant) => {
+      socket.emit("shareEnded", { target: participant.socketId });
+    });
+  }
+  STATE.isScreensharing = false;
+}
+
+export function showSidePanel() {
+  sidePanel.classList.remove("CLOSED");
+  sidePanel.classList.add("OPEN");
+  sidePanelBtn.classList.remove("CLOSED");
+  sidePanelBtn.classList.add("OPEN");
+  panelheader.classList.remove("CLOSED");
+  panelheader.classList.add("OPEN");
+  panelPart.classList.remove("CLOSED");
+  panelPart.classList.add("OPEN");
+  STATE.sidePanel = true;
+}
+
+export function hideSidePanel() {
+  sidePanel.classList.remove("OPEN");
+  sidePanel.classList.add("CLOSED");
+  sidePanelBtn.classList.remove("OPEN");
+  sidePanelBtn.classList.add("CLOSED");
+  panelheader.classList.remove("OPEN");
+  panelheader.classList.add("CLOSED");
+  panelPart.classList.remove("OPEN");
+  panelPart.classList.add("CLOSED");
+  STATE.sidePanel = false;
+}
+
+export function handleHostLeft(msg) {
+  alert(msg);
+  window.location.href = "index.html";
+}

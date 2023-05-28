@@ -8,6 +8,17 @@ import {
   handleAnswer,
   handleCandidate,
   handleParticipantViewing,
+  toggleFullScreen,
+  handleFullscreenChange,
+  copyByBtn,
+  leaveRoom,
+  handleContinue,
+  joinRoom,
+  shareScreen,
+  stopSharing,
+  showSidePanel,
+  hideSidePanel,
+  handleHostLeft,
 } from "./utils.js";
 
 //Variables
@@ -20,10 +31,9 @@ export const STATE = {
   isHost: false,
   sidePanel: false,
   isScreensharing: false,
+  fullscreen: false,
 };
-const { id: roomId } = Qs.parse(location.search, {
-  ignoreQueryPrefix: true,
-});
+
 export const servers = {
   iceServers: [
     {
@@ -38,77 +48,23 @@ export const servers = {
 };
 
 //DOM elements
+const leaveRoomBtn = document.getElementById("leave-room");
+const continueBtn = document.getElementById("button-continue");
 export const username = document.getElementById("input-username");
 export const remember = document.getElementById("ask-again");
-const continueBtn = document.getElementById("button-continue");
-// const userMenu = document.getElementById("userMenu");
-const video = document.getElementById("video");
-const shareButton = document.getElementById("share-btn");
-const sidePanel = document.getElementById("side-panel");
-const sidePanelBtn = document.getElementById("side-panel-btn");
-const panelheader = document.getElementById("panel-header");
-const panelPart = document.getElementById("participants");
-const leave = document.getElementById("leave-room");
+export const video = document.getElementById("video");
+export const shareButton = document.getElementById("share-btn");
+export const sidePanel = document.getElementById("side-panel");
+export const sidePanelBtn = document.getElementById("side-panel-btn");
+export const panelheader = document.getElementById("panel-header");
+export const panelPart = document.getElementById("participants");
+export const modal = document.getElementById("modal");
+export const url = window.location.href;
+export const copyURLElement = document.getElementById("copy-link");
+export const copyURLMessage = document.getElementById("copyMessage");
+export const copyBtn = document.getElementById("copy-btn");
 
 //Functions
-function joinRoom() {
-  if (socket) {
-    socket.emit("joinRoom", { username: STATE.myUsername, roomId });
-  }
-}
-
-function leaveRoom() {
-  if(STATE.isHost){
-    alert("Host" +  STATE.myUsername + " has ended the session")
-  }
-  window.location.href = "index.html";
-}
-
-async function shareScreen() {
-  if (STATE.isHost) {
-    await navigator.mediaDevices
-      .getDisplayMedia({ video: true, audio: true })
-      .then((stream) => {
-        STATE.localStream = stream;
-        video.srcObject = STATE.localStream;
-        STATE.isScreensharing = true;
-        shareButton.innerHTML = "Stop sharing";
-        video.style.backgroundColor = "white";
-        STATE.participants.map((participant) => {
-          if (participant.pc)
-            STATE.localStream.getTracks().forEach((track) => {
-              track.addEventListener("ended", () =>
-                handleStopScreenShare(participant.socketId)
-              );
-              participant.pc.addTrack(track, STATE.localStream);
-            });
-
-          console.log(
-            "🚀 ~ file: sharespace.js:101 ~ STATE.participants.map ~ participant:",
-            participant
-          );
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-}
-
-function stopSharing() {
-  if (STATE.localStream) {
-    STATE.localStream.getTracks()[0].stop();
-    console.log(STATE.localStream.getTracks()[0]);
-    STATE.localStream = null;
-    video.srcObject = null;
-    shareButton.innerHTML = "Share Screen";
-
-    STATE.participants.map((participant) => {
-      socket.emit("shareEnded", { target: participant.socketId });
-    });
-  }
-  STATE.isScreensharing = false;
-}
 
 function handleStopScreenShare(socketId) {
   if (STATE.isHost) {
@@ -131,56 +87,16 @@ function handleShareEnded() {
   video.controls = false;
 }
 
-function handleHostLeft(msg) {
-  alert(msg);
-  window.location.href = "index.html";
-}
-
-function showSidePanel() {
-  sidePanel.classList.remove("CLOSED");
-  sidePanel.classList.add("OPEN");
-  sidePanelBtn.classList.remove("CLOSED");
-  sidePanelBtn.classList.add("OPEN");
-  panelheader.classList.remove("CLOSED");
-  panelheader.classList.add("OPEN");
-  panelPart.classList.remove("CLOSED");
-  panelPart.classList.add("OPEN");
-  STATE.sidePanel = true;
-}
-
-function hideSidePanel() {
-  sidePanel.classList.remove("OPEN");
-  sidePanel.classList.add("CLOSED");
-  sidePanelBtn.classList.remove("OPEN");
-  sidePanelBtn.classList.add("CLOSED");
-  panelheader.classList.remove("OPEN");
-  panelheader.classList.add("CLOSED");
-  panelPart.classList.remove("OPEN");
-  panelPart.classList.add("CLOSED");
-  STATE.sidePanel = false;
-}
-
-sidePanelBtn.onclick = () => {
-  if (STATE.sidePanel) {
-    hideSidePanel();
-  } else {
-    showSidePanel();
-  }
-};
-
-function handleError(error) {
-  alert(error.msg);
-}
-
 function init() {
   getStoredUsername();
+  copyURLElement.innerHTML = url;
   if (STATE.myUsername) {
     joinRoom();
   }
 }
 
 //EventListeners
-leave.onclick = () => leaveRoom();
+leaveRoomBtn.onclick = () => leaveRoom();
 
 shareButton.onclick = () => {
   if (!STATE.isScreensharing) {
@@ -190,30 +106,20 @@ shareButton.onclick = () => {
   stopSharing();
 };
 
-continueBtn.onclick = () => {
-  const value = username.value;
-  const dontaskagain = remember.checked;
+continueBtn.onclick = handleContinue;
 
-  if (value !== "" && value !== " ") {
-    STATE.myUsername = value;
+copyURLElement.onclick = copyURL;
 
-    modal.classList.remove("OPEN");
-    modal.classList.add("CLOSED");
-    joinRoom();
+copyBtn.onclick = copyByBtn;
 
-    if (dontaskagain) {
-      localStorage.setItem("_SP_username", STATE.myUsername);
-    }
-    if (!dontaskagain) {
-      localStorage.removeItem("_SP_username");
-    }
-    console.log(STATE);
-  } else {
-    alert("please enter your name");
-  }
+sidePanelBtn.onclick = () => {
+  if (!STATE.sidePanel) return showSidePanel();
+  hideSidePanel();
 };
 
-// userMenu.onclick = () => openUserMeny();
+video.onclick = toggleFullScreen;
+
+document.addEventListener("fullscreenchange", (e) => handleFullscreenChange(e));
 
 //Socket listeners
 socket.on("socketId", (id) => {

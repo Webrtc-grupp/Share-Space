@@ -3,6 +3,7 @@
   --dark-gray: #323c46;
   --light-gray: #d9d9d9;
   --blue: #0780ff;
+  --green: #00e5ff;
   --red: #ff2d55;
   --radius: 6px;
   --box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
@@ -17,12 +18,20 @@
   box-sizing: border-box;
 }
 
+html {
+  height: -webkit-fill-available;
+}
+
 body {
   color: var(--dark-gray);
   background-color: var(--background-color);
   font-family: -apple-system, "Segoe UI", Helvetica, sans-serif;
   margin: 0;
   overflow: hidden;
+  height: -webkit-fill-available;
+  background-color: var(--background-color);
+  display: flex;
+  justify-content: center;
 }
 
 .font-xsmall {
@@ -127,6 +136,7 @@ body {
 
 .eye.OPEN {
   display: block;
+  margin-right: 0.5rem;
 }
 
 #side-panel {
@@ -175,6 +185,7 @@ body {
   width: 36px;
   max-width: 36px;
   flex: 10% 1 0;
+  margin-left: 0.5rem;
 }
 
 .participant {
@@ -184,7 +195,6 @@ body {
   background-color: var(--light-gray);
   border-radius: var(--radius);
   gap: 6px;
-  padding-left: clamp(2px, 100%, 8px);
 }
 
 .participant p {
@@ -244,10 +254,27 @@ svg:hover {
   background-color: #fff;
   padding-left: 0.5rem;
   border-radius: var(--radius);
+  border: 1px solid var(--light-gray);
+  position: relative;
+}
+
+#link-wrapper span {
+  top: calc(var(--font-size-medium) * -1);
+  position: absolute;
+  font-size: var(--font-size-medium);
+  animation: wiggle alternate 1.5s;
+  animation-delay: 0s;
+  animation-iteration-count: 2;
 }
 
 #copy-btn {
   display: none;
+}
+
+#main {
+  background-color: var(--background-color);
+  max-width: 1920px;
+  outline: 1px solid var(--light-gray);
 }
 
 .video-wrapper-center {
@@ -257,7 +284,7 @@ svg:hover {
   justify-content: center;
   gap: 16px;
   padding: 0 36px;
-  max-width: 2000px;
+  max-width: 1920px;
   width: 100%;
 }
 
@@ -272,11 +299,16 @@ svg:hover {
 #video {
   margin-left: auto;
   margin-right: auto;
-  height: clamp(240px, 50vh, 1080px);
-  border: 1px solid var(--dark-gray);
+  width: clamp(260px, 100%, 1920px);
+  max-height: 60vh;
+  border: 1px solid var(--light-gray);
   border-radius: var(--radius);
   outline: 0;
-  width: 100%;
+  position: relative;
+}
+
+#video:hover {
+  cursor: move;
 }
 
 video::-webkit-media-controls-panel {
@@ -304,6 +336,30 @@ video::-webkit-media-controls-panel:hover {
 #copy-link {
   text-decoration: underline;
   cursor: pointer;
+  font-weight: 700;
+}
+
+#info {
+  font-size: var(--font-size-small);
+  background-color: white;
+  border: 1px solid var(--light-gray);
+  width: fit-content;
+  border-radius: var(--radius);
+  padding: 1rem;
+  position: relative;
+}
+
+#info span {
+  top: calc(var(--font-size-medium) * -1);
+  position: absolute;
+  font-size: var(--font-size-medium);
+  animation: wiggle alternate 1.5s;
+  animation-delay: 3s;
+  animation-iteration-count: 2;
+}
+
+#info.HIDDEN {
+  display: none;
 }
 
 .hostEl {
@@ -311,9 +367,36 @@ video::-webkit-media-controls-panel:hover {
   color: var(--blue);
 }
 
+/* .me .hostEl {
+  color: white;
+} */
+
+.me {
+  /* background-color: var(--green); */
+  border: 4px solid var(--green);
+  /* color: white; */
+  cursor: pointer;
+  position: relative;
+}
+
+.me:hover::after {
+  content: "📝 Edit your username";
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 10;
+  background-color: var(--green);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+}
+
 /* Mediaqueries */
 
-@media (max-width: 760px) {
+@media (max-width: 1060px) {
   #main {
     display: flex;
     flex-direction: column;
@@ -336,6 +419,7 @@ video::-webkit-media-controls-panel:hover {
 
   #video {
     height: auto;
+    max-width: 90%;
   }
 
   #side-panel-btn {
@@ -343,7 +427,6 @@ video::-webkit-media-controls-panel:hover {
     height: 20px;
     font-size: var(--font-size-big);
     margin: 0 auto;
-    /* transform: translateY(calc(-50% - var(--font-size-big) / 2)); */
     line-height: 1;
     display: block;
   }
@@ -430,5 +513,14 @@ video::-webkit-media-controls-panel:hover {
   }
   to {
     transform: translateY(94%);
+  }
+}
+
+@keyframes wiggle {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-120deg);
   }
 }

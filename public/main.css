@@ -65,6 +65,7 @@ h2 {
 .line {
   width: 100%;
   color: var(--light-gray);
+  margin: 0;
 }
 
 .container-centered-centered {
@@ -250,6 +251,12 @@ svg:hover {
   display: none;
 }
 
+#leave-room {
+  margin: 0;
+  width: 30px;
+  height: 30px;
+}
+
 #side-panel-btn {
   display: none;
 }
@@ -263,6 +270,7 @@ svg:hover {
 }
 
 #link-wrapper span {
+  opacity: 0.5;
   top: calc(var(--font-size-medium) * -1);
   position: absolute;
   font-size: var(--font-size-medium);
@@ -285,7 +293,7 @@ svg:hover {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   gap: 16px;
   padding: 0 36px;
   max-width: 1920px;
@@ -349,11 +357,12 @@ video::-webkit-media-controls-panel:hover {
   border: 1px solid var(--light-gray);
   width: fit-content;
   border-radius: var(--radius);
-  padding: 1rem;
+  padding: 0.5rem;
   position: relative;
 }
 
 #info span {
+  opacity: 0.5;
   top: calc(var(--font-size-medium) * -1);
   position: absolute;
   font-size: var(--font-size-medium);
@@ -370,10 +379,6 @@ video::-webkit-media-controls-panel:hover {
   font-weight: 600;
   color: var(--blue);
 }
-
-/* .me .hostEl {
-  color: white;
-} */
 
 .me {
   /* background-color: var(--green); */
@@ -421,6 +426,10 @@ video::-webkit-media-controls-panel:hover {
   .video-wrapper-center {
     padding: 10px;
     max-width: 100%;
+  }
+
+  #link-wrapper span {
+    display: none;
   }
 
   #side-panel {
@@ -534,9 +543,11 @@ video::-webkit-media-controls-panel:hover {
 
 @keyframes wiggle {
   from {
+    opacity: 1;
     transform: rotate(0deg);
   }
   to {
+    opacity: 1;
     transform: rotate(-120deg);
   }
 }

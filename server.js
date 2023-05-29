@@ -75,6 +75,18 @@ io.on("connection", (socket) => {
       console.log(payload);
       io.to(payload.target).emit("viewing", payload);
     });
+    socket.on("username", (payload) => {
+      socket.viewing = payload.viewing;
+      const { username } = payload;
+      console.log(payload);
+      socket.username = username;
+      console.log("Socket after change username" + socket.username);
+      io.to(payload.target).emit(
+        "message",
+        "Username Changed to" + payload.username
+      );
+      io.to(roomId).emit("participants", participantsInRoom);
+    });
     socket.on("error", (payload) => {
       socket.error = payload.error;
       io.to(payload.target).emit("error", payload);

@@ -113,7 +113,7 @@ function updateParticipantsList(participants) {
     avatar.innerHTML = "👨‍⚕️";
 
     const eye = document.createElement("div");
-    eye.classList.add("HIDDEN");
+    if (!participant.viewing) eye.classList.add("HIDDEN");
     eye.classList.add("eye");
     eye.innerHTML = "Viewing";
 
@@ -327,11 +327,13 @@ export function handleParticipantViewing({ sender, viewing }) {
   // child.classList.contains(className));
   const eyeElement = participantContainer.querySelector(".eye");
   if (viewing && eyeElement) {
+    STATE.participants.find((part) => part.socketId === sender).viewing = true;
     eyeElement.classList.remove("HIDDEN");
     eyeElement.classList.add("OPEN");
     return;
   }
   if (!viewing && eyeElement) {
+    STATE.participants.find((part) => part.socketId === sender).viewing = false;
     eyeElement.classList.add("HIDDEN");
     eyeElement.classList.remove("OPEN");
 
@@ -391,7 +393,7 @@ export function handleContinue() {
   const value = username.value;
   const dontaskagain = remember.checked;
 
-  if (value !== "" && value !== " ") {
+  if (value !== "" && value !== " " && !STATE.mySocketId) {
     STATE.myUsername = value;
 
     modal.classList.remove("OPEN");
@@ -405,9 +407,22 @@ export function handleContinue() {
       localStorage.removeItem("_SP_username");
     }
     console.log(STATE);
-  } else {
-    alert("please enter your name");
+  } else if (value !== "" && value !== " " && STATE.mySocketId) {
+    STATE.myUsername = value;
+    updateUsername(value);
+    modal.classList.remove("OPEN");
+    modal.classList.add("CLOSED");
+
+    if (dontaskagain) {
+      localStorage.setItem("_SP_username", STATE.myUsername);
+    }
+    if (!dontaskagain) {
+      localStorage.removeItem("_SP_username");
+    }
+    console.log(STATE);
+    return;
   }
+  alert("please enter your name");
 }
 
 export async function shareScreen() {
@@ -486,4 +501,12 @@ export function hideSidePanel() {
 export function handleHostLeft(msg) {
   alert(msg);
   window.location.href = "index.html";
+}
+
+function updateUsername(newUsername) {
+  if (socket && newUsername && STATE.mySocketId) {
+    socket.emit("username", {
+      username: newUsername,
+    });
+  }
 }

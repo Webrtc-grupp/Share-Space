@@ -34,6 +34,10 @@ body {
   justify-content: center;
 }
 
+h2 {
+  margin: 0;
+}
+
 .font-xsmall {
   font-size: var(--font-size-xsmall);
 }
@@ -207,14 +211,14 @@ body {
 .wrapper {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
+  padding: 1rem;
 }
 
 input[type="text"] {
   padding: 10px;
   border-radius: var(--radius);
-  border: 1px solid var(--dark-gray);
-  background-color: var(--light-gray);
+  border: 1px solid var(--light-gray);
 }
 
 input[type="text"]:focus {
@@ -373,25 +377,37 @@ video::-webkit-media-controls-panel:hover {
 
 .me {
   /* background-color: var(--green); */
-  border: 4px solid var(--green);
+  border: 4px solid var(--blue);
   /* color: white; */
   cursor: pointer;
   position: relative;
 }
 
-.me:hover::after {
+.me:hover {
+  background-color: var(--blue);
+}
+
+.me::after {
   content: "📝 Edit your username";
+  color: white;
   width: 100%;
   max-width: 100%;
   height: 100%;
   position: absolute;
-  z-index: 10;
-  background-color: var(--green);
+  z-index: -1;
+  background-color: var(--blue);
   border-radius: var(--radius);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-small);
+  opacity: 0;
+}
+
+.me:hover::after {
+  opacity: 1;
+  transition: 0.3s;
+  z-index: 10;
 }
 
 /* Mediaqueries */

@@ -19,6 +19,7 @@ import {
   showSidePanel,
   hideSidePanel,
   handleHostLeft,
+  handleJoinedRoom,
 } from "./utils.js";
 
 //Variables
@@ -32,6 +33,7 @@ export const STATE = {
   sidePanel: false,
   isScreensharing: false,
   fullscreen: false,
+  joinedRoom: false,
 };
 
 export const servers = {
@@ -125,6 +127,7 @@ document.addEventListener("fullscreenchange", (e) => handleFullscreenChange(e));
 socket.on("socketId", (id) => {
   STATE.mySocketId = id;
 });
+socket.on("roomJoined", (roomJoinedId) => handleJoinedRoom(roomJoinedId));
 socket.on("isHost", (isHost) => handleIsHost(isHost));
 socket.on("participants", (participants) => handleParticipants(participants));
 socket.on("hostLeft", (msg) => handleHostLeft(msg));

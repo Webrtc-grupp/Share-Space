@@ -66,11 +66,18 @@ export function handleParticipants(participants) {
   //Lägg till nya - ej dubbletter
   participants.forEach((participant) => {
     console.log(participant);
-    const findParticipants = STATE.participants.find(
+    const participantMatch = STATE.participants.find(
       (part) => part.socketId === participant.socketId
     );
 
-    if (findParticipants) return;
+    if (participantMatch) {
+      console.log(participant.username);
+      if (participantMatch.username === participant.username) return;
+      if (participantMatch.username !== participant.username) {
+        participantMatch.username = participant.username;
+        return;
+      }
+    }
     console.log("Adding participant: " + participant.username);
     STATE.participants.push(participant);
   });
@@ -85,7 +92,7 @@ export function handleParticipants(participants) {
   });
 
   //Uppdatera visuella element
-  updateParticipantsList(participants);
+  updateParticipantsList(STATE.participants);
   createPcParticipant();
   console.log(STATE);
 }
@@ -95,6 +102,10 @@ function updateParticipantsList(participants) {
   parentDiv.innerHTML = "";
 
   participants.forEach((participant) => {
+    console.log(
+      "🚀 ~ file: utils.js:105 ~ participants.forEach ~ participant:",
+      participant
+    );
     const participantContainer = document.createElement("div");
     participantContainer.classList.add("container-flex-row");
     participantContainer.classList.add("participant");
@@ -393,7 +404,8 @@ export function handleContinue() {
   const value = username.value;
   const dontaskagain = remember.checked;
 
-  if (value !== "" && value !== " " && !STATE.mySocketId) {
+  debugger;
+  if (value !== "" && value !== " " && !STATE.joinedRoom) {
     STATE.myUsername = value;
 
     modal.classList.remove("OPEN");
@@ -407,9 +419,10 @@ export function handleContinue() {
       localStorage.removeItem("_SP_username");
     }
     console.log(STATE);
-  } else if (value !== "" && value !== " " && STATE.mySocketId) {
+    return;
+  } else if (value !== "" && value !== " " && STATE.joinedRoom) {
     STATE.myUsername = value;
-    updateUsername(value);
+    updateUsername(STATE.myUsername);
     modal.classList.remove("OPEN");
     modal.classList.add("CLOSED");
 
@@ -438,7 +451,6 @@ export async function shareScreen() {
           if (participant.pc)
             STATE.localStream.getTracks().forEach((track) => {
               track.addEventListener("removetrack", () => {
-                debugger;
                 handleStopScreenShare(participant.socketId);
               });
               participant.pc.addTrack(track, STATE.localStream);
@@ -507,6 +519,13 @@ function updateUsername(newUsername) {
   if (socket && newUsername && STATE.mySocketId) {
     socket.emit("username", {
       username: newUsername,
+      roomId,
     });
+  }
+}
+
+export function handleJoinedRoom(roomJoinedId) {
+  if (roomId === roomJoinedId) {
+    STATE.joinedRoom = true;
   }
 }

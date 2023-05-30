@@ -32,65 +32,53 @@ io.on("connection", (socket) => {
   socket.emit("socketId", socket.id);
 
   socket.on("joinRoom", ({ username, roomId }) => {
+    console.log("Joining room", username, roomId);
     socket.join(roomId);
     socket.username = username;
 
-    const socketIdsInRoom = [...socket.adapter.rooms.get(roomId)];
+    io.to(roomId).emit(
+      "participants",
+      getParticipantsInRoom({ roomId, socket })
+    );
 
-    if (socketIdsInRoom.length === 1) {
-      socket.host = true;
-      socket.emit("isHost", true);
-    }
+    socket.emit("roomJoined", roomId);
+  });
 
-    const participantsInRoom = [];
+  socket.on("offer", (payload) => {
+    io.to(payload.target).emit("offer", payload);
+    console.log(payload);
+  });
+  socket.on("answer", (payload) => {
+    io.to(payload.target).emit("answer", payload);
+  });
+  socket.on("candidate", (payload) => {
+    io.to(payload.target).emit("candidate", payload);
+  });
+  socket.on("shareEnded", (payload) => {
+    io.to(payload.target).emit("shareEnded", payload);
+  });
+  socket.on("viewing", (payload) => {
+    socket.viewing = payload.viewing;
+    console.log(payload);
+    io.to(payload.target).emit("viewing", payload);
+  });
+  socket.on("username", (payload) => {
+    const { username, roomId } = payload;
+    socket.username = username;
+    console.log("Socket after change username" + socket.username);
+    io.to(payload.target).emit(
+      "message",
+      "Username Changed to" + payload.username
+    );
 
-    socketIdsInRoom.forEach((id) => {
-      const participant = { socketId: id, isHost: false };
-      const participantSocket = io.sockets.sockets.get(id);
-
-      if (participantSocket.username) {
-        participant.username = participantSocket.username;
-        if (participantSocket.host) participant.isHost = true;
-        participantsInRoom.push(participant);
-      }
-    });
-
-    io.to(roomId).emit("participants", participantsInRoom);
-
-    socket.on("offer", (payload) => {
-      io.to(payload.target).emit("offer", payload);
-      console.log(payload);
-    });
-    socket.on("answer", (payload) => {
-      io.to(payload.target).emit("answer", payload);
-    });
-    socket.on("candidate", (payload) => {
-      io.to(payload.target).emit("candidate", payload);
-    });
-    socket.on("shareEnded", (payload) => {
-      io.to(payload.target).emit("shareEnded", payload);
-    });
-    socket.on("viewing", (payload) => {
-      socket.viewing = payload.viewing;
-      console.log(payload);
-      io.to(payload.target).emit("viewing", payload);
-    });
-    socket.on("username", (payload) => {
-      socket.viewing = payload.viewing;
-      const { username } = payload;
-      console.log(payload);
-      socket.username = username;
-      console.log("Socket after change username" + socket.username);
-      io.to(payload.target).emit(
-        "message",
-        "Username Changed to" + payload.username
-      );
-      io.to(roomId).emit("participants", participantsInRoom);
-    });
-    socket.on("error", (payload) => {
-      socket.error = payload.error;
-      io.to(payload.target).emit("error", payload);
-    });
+    io.to(roomId).emit(
+      "participants",
+      getParticipantsInRoom({ roomId, socket })
+    );
+  });
+  socket.on("error", (payload) => {
+    socket.error = payload.error;
+    io.to(payload.target).emit("error", payload);
   });
 });
 
@@ -127,6 +115,35 @@ io.of("/").adapter.on("leave-room", (room, id) => {
   );
   io.to(room).emit("participants", participantsInRoom);
 });
+
+function getParticipantsInRoom({ roomId, socket }) {
+  // console.log(
+  //   "🚀 ~ file: server.js:118 ~ getParticipantsInRoom ~ roomId, socket:",
+  //   roomId,
+  //   socket
+  // );
+  const socketIdsInRoom = [...socket.adapter.rooms.get(roomId)];
+
+  if (socketIdsInRoom.length === 1) {
+    socket.host = true;
+    socket.emit("isHost", true);
+  }
+
+  const participantsInRoom = [];
+
+  socketIdsInRoom.forEach((id) => {
+    const participant = { socketId: id, isHost: false };
+    const participantSocket = io.sockets.sockets.get(id);
+
+    if (participantSocket.username) {
+      participant.username = participantSocket.username;
+      if (participantSocket.host) participant.isHost = true;
+      participantsInRoom.push(participant);
+    }
+  });
+
+  return participantsInRoom;
+}
 
 //Server initialization
 server.listen(PORT, () => {

@@ -267,18 +267,36 @@ svg:hover {
   background-color: #fff;
   padding-left: 0.5rem;
   border-radius: var(--radius);
-  border: 1px solid var(--light-gray);
+  border: 1px solid var(--dark-gray);
+  position: relative;
+  border-style: dashed;
+  animation: fade 0.5s ease-out 1 forwards;
+}
+
+.link-wrapper-lower {
+  width: max-content;
+}
+
+#copy-message {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+#copy-link {
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 700;
+  width: max-content;
   position: relative;
 }
 
-#link-wrapper span {
-  opacity: 0.5;
-  top: calc(var(--font-size-medium) * -1);
+#copy-link::after {
+  content: "👇";
   position: absolute;
-  font-size: var(--font-size-medium);
-  animation: wiggle alternate 1.5s;
-  animation-delay: 0s;
-  animation-iteration-count: 2;
+  top: -100%;
+  left: 0;
+  animation: slide 3s 1 0.5s ease-in-out;
+  opacity: 0;
 }
 
 #copy-btn {
@@ -347,12 +365,6 @@ video::-webkit-media-controls-panel:hover {
   display: none;
 }
 
-#copy-link {
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: 700;
-}
-
 #info {
   font-size: var(--font-size-small);
   background-color: white;
@@ -361,16 +373,6 @@ video::-webkit-media-controls-panel:hover {
   border-radius: var(--radius);
   padding: 0.5rem;
   position: relative;
-}
-
-#info span {
-  opacity: 0.5;
-  top: calc(var(--font-size-medium) * -1);
-  position: absolute;
-  font-size: var(--font-size-medium);
-  animation: wiggle alternate 1.5s;
-  animation-delay: 3s;
-  animation-iteration-count: 2;
 }
 
 #info.HIDDEN {
@@ -550,5 +552,68 @@ video::-webkit-media-controls-panel:hover {
   to {
     opacity: 1;
     transform: rotate(-120deg);
+  }
+}
+
+@keyframes slide {
+  0% {
+    opacity: 1;
+    top: -20vh;
+    left: 0;
+  }
+  5% {
+    opacity: 1;
+    top: -100%;
+    left: 0;
+  }
+  25% {
+    top: -100%;
+    left: 100%;
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+    top: 100%;
+    left: 100%;
+  }
+  75% {
+    transform: rotate(180deg);
+    top: 100%;
+    left: 0%;
+  }
+  90% {
+    top: -100%;
+    left: 0%;
+    transform: rotate(0deg);
+  }
+  95% {
+    top: -60%;
+    left: 0%;
+    transform: rotate(0deg);
+    transform: scale(90%);
+  }
+  98% {
+    top: -90%;
+    left: 0%;
+    transform: scale(100%);
+    transform: rotate(0deg);
+  }
+  100% {
+    top: -20vh;
+    left: 0%;
+    transform: scale(100%);
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes fade {
+  from {
+    transform: scale(98%);
+    opacity: 0;
+  }
+  to {
+    transform: scale(100%);
+    opacity: 1;
   }
 }

@@ -63,7 +63,7 @@ export const panelPart = document.getElementById("participants");
 export const modal = document.getElementById("modal");
 export const url = window.location.href;
 export const copyURLElement = document.getElementById("copy-link");
-export const copyURLMessage = document.getElementById("copyMessage");
+export const copyURLMessage = document.getElementById("copy-message");
 export const copyBtn = document.getElementById("copy-btn");
 
 //Functions

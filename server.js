@@ -46,26 +46,29 @@ io.on("connection", (socket) => {
 
   socket.on("offer", (payload) => {
     io.to(payload.target).emit("offer", payload);
-    console.log(payload);
   });
+
   socket.on("answer", (payload) => {
     io.to(payload.target).emit("answer", payload);
   });
+
   socket.on("candidate", (payload) => {
     io.to(payload.target).emit("candidate", payload);
   });
+
   socket.on("shareEnded", (payload) => {
     io.to(payload.target).emit("shareEnded", payload);
   });
+
   socket.on("viewing", (payload) => {
     socket.viewing = payload.viewing;
-    console.log(payload);
     io.to(payload.target).emit("viewing", payload);
   });
+
   socket.on("username", (payload) => {
     const { username, roomId } = payload;
     socket.username = username;
-    console.log("Socket after change username" + socket.username);
+    console.log("Socket after change username: " + socket.username);
     io.to(payload.target).emit(
       "message",
       "Username Changed to" + payload.username
@@ -76,6 +79,7 @@ io.on("connection", (socket) => {
       getParticipantsInRoom({ roomId, socket })
     );
   });
+
   socket.on("error", (payload) => {
     socket.error = payload.error;
     io.to(payload.target).emit("error", payload);

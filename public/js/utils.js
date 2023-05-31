@@ -212,7 +212,13 @@ function createParticipantPeerConnection(participant) {
         msg: "WebRTC connection failed",
       });
       // Display an alert when WebRTC fails
-      alert("WebRTC connection failed!");
+      console.error("WebRTC connection failed!");
+      console.warn(
+        "Sending new offer to ",
+        participant.username,
+        "since connection failed"
+      );
+      createPartOffer(participant);
     }
   };
   console.log(participant.pc);
@@ -404,7 +410,6 @@ export function handleContinue() {
   const value = username.value;
   const dontaskagain = remember.checked;
 
-  debugger;
   if (value !== "" && value !== " " && !STATE.joinedRoom) {
     STATE.myUsername = value;
 

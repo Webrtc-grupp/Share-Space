@@ -68,16 +68,16 @@ export const copyBtn = document.getElementById("copy-btn");
 
 //Functions
 
-function handleStopScreenShare(socketId) {
-  if (STATE.isHost) {
-    video.srcObject = null;
-    shareButton.innerHTML = "Share Screen";
-    STATE.isScreensharing = false;
-  }
-  if (socketId) {
-    socket.emit("shareEnded", { target: socketId });
-  }
-}
+// function handleStopScreenShare(socketId) {
+//   if (STATE.isHost) {
+//     video.srcObject = null;
+//     shareButton.innerHTML = "Share Screen";
+//     STATE.isScreensharing = false;
+//   }
+//   if (socketId) {
+//     socket.emit("shareEnded", { target: socketId });
+//   }
+// }
 
 function handleShareEnded() {
   console.log("Share Ended");

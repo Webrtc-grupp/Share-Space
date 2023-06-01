@@ -358,13 +358,15 @@ export function copyURL() {
     .then(() => {
       copyURLMessage.innerHTML = "URL copied to clipboard 😍";
       setTimeout(() => {
-        copyURLMessage.innerHTML = "Click to copy link";
+        copyURLMessage.innerHTML =
+          " Click the link to copy and share it";
       }, 2000);
     })
     .catch((error) => {
       copyURLMessage.innerHTML = error;
       setTimeout(() => {
-        copyURLMessage.innerHTML = "Click to copy link";
+        copyURLMessage.innerHTML =
+          "Click the link to copy and share it";
       }, 2000);
     });
 }
@@ -375,13 +377,15 @@ export function copyByBtn() {
     .then(() => {
       copyBtn.innerHTML = "URL copied to clipboard 😍";
       setTimeout(() => {
-        copyBtn.innerHTML = "Copy link";
+        copyBtn.innerHTML =
+          " Click the link to copy and share it";
       }, 2000);
     })
     .catch((error) => {
       copyBtn.innerHTML = error;
       setTimeout(() => {
-        copyBtn.innerHTML = "Click to copy link";
+        copyBtn.innerHTML =
+          " Click the link to copy and share it";
       }, 2000);
     });
 }
@@ -404,7 +408,6 @@ export function handleContinue() {
   const value = username.value;
   const dontaskagain = remember.checked;
 
-  debugger;
   if (value !== "" && value !== " " && !STATE.joinedRoom) {
     STATE.myUsername = value;
 

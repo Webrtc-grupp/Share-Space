@@ -91,11 +91,15 @@ io.of("/").adapter.on("leave-room", (room, id) => {
 
   const participantThatLeft = io.sockets.sockets.get(id);
 
-  if (participantThatLeft.host)
+  if (participantThatLeft.host) {
     io.to(room).emit(
       "hostLeft",
       `Host ${participantThatLeft.username} ended the session`
     );
+    socketIdsInRoom.map((socketId) => {
+      io.sockets.sockets.get(socketId).leave(room);
+    });
+  }
 
   socketIdsInRoom.forEach((id) => {
     const participant = { socketId: id, isHost: false };

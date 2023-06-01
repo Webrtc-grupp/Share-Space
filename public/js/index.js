@@ -26,7 +26,7 @@ async function getRoom() {
     const roomMadeComfirmation = document.createElement("p");
     roomMadeComfirmation.id = "roomMadeComfirmation";
     roomMadeComfirmation.innerHTML =
-      "Room created successfully! Going to room please wait...";
+      "Room created successfully! Moving to room please wait...";
     wrapper.appendChild(roomMadeComfirmation);
 
     setTimeout(function () {

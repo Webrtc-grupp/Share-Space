@@ -212,7 +212,14 @@ function createParticipantPeerConnection(participant) {
         msg: "WebRTC connection failed",
       });
       // Display an alert when WebRTC fails
-      alert("WebRTC connection failed!");
+      console.error("WebRTC connection failed!");
+      console.warn(
+        "Sending new offer to ",
+        participant.username,
+        "since connection failed"
+      );
+      // createPartOffer(participant);
+      participant.pc.restartIce();
     }
   };
   console.log(participant.pc);
@@ -358,15 +365,13 @@ export function copyURL() {
     .then(() => {
       copyURLMessage.innerHTML = "URL copied to clipboard 😍";
       setTimeout(() => {
-        copyURLMessage.innerHTML =
-          " Click the link to copy and share it";
+        copyURLMessage.innerHTML = " Click the link to copy and share it";
       }, 2000);
     })
     .catch((error) => {
       copyURLMessage.innerHTML = error;
       setTimeout(() => {
-        copyURLMessage.innerHTML =
-          "Click the link to copy and share it";
+        copyURLMessage.innerHTML = "Click the link to copy and share it";
       }, 2000);
     });
 }
@@ -377,15 +382,13 @@ export function copyByBtn() {
     .then(() => {
       copyBtn.innerHTML = "URL copied to clipboard 😍";
       setTimeout(() => {
-        copyBtn.innerHTML =
-          " Click the link to copy and share it";
+        copyBtn.innerHTML = " Click the link to copy and share it";
       }, 2000);
     })
     .catch((error) => {
       copyBtn.innerHTML = error;
       setTimeout(() => {
-        copyBtn.innerHTML =
-          " Click the link to copy and share it";
+        copyBtn.innerHTML = " Click the link to copy and share it";
       }, 2000);
     });
 }
@@ -395,7 +398,10 @@ export function leaveRoom() {
 }
 
 export function handleError(error) {
-  alert(error.msg);
+  console.log(error.msg);
+  alert(
+    "Something went wrong, please try to reload the page or start a new session"
+  );
 }
 
 export function joinRoom() {

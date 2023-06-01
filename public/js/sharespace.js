@@ -20,6 +20,7 @@ import {
   hideSidePanel,
   handleHostLeft,
   handleJoinedRoom,
+  handleError,
 } from "./utils.js";
 
 //Variables
@@ -43,8 +44,23 @@ export const servers = {
     },
     {
       urls: "turn:a.relay.metered.ca:80",
-      username: "f6de8d4b9f7bd1de1408b8f3",
-      credential: "FAZrFTuBsCxg3KxA",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
+    },
+    {
+      urls: "turn:a.relay.metered.ca:80?transport=tcp",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
+    },
+    {
+      urls: "turn:a.relay.metered.ca:443",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
+    },
+    {
+      urls: "turn:a.relay.metered.ca:443?transport=tcp",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
     },
   ],
 };

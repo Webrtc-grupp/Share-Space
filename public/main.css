@@ -407,16 +407,6 @@ video::-webkit-media-controls-panel:hover {
   position: relative;
 }
 
-#info span {
-  opacity: 0.5;
-  top: calc(var(--font-size-medium) * -1);
-  position: absolute;
-  font-size: var(--font-size-medium);
-  animation: wiggle alternate 1.5s;
-  animation-delay: 3s;
-  animation-iteration-count: 2;
-}
-
 #info.HIDDEN {
   display: none;
 }

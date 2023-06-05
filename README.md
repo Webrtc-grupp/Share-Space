@@ -13,6 +13,6 @@ The app is currently live at: https://share-space-cwnn.onrender.com/
 
 #### Authors
 
-Yvon Lascone https://github.com/tyl26
+Yvon Lascano https://github.com/tyl26
 
 Bobby Rösehag https://github.com/bobbyem

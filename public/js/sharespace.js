@@ -7,7 +7,23 @@ import {
   handleOffer,
   handleAnswer,
   handleCandidate,
+  handleParticipantViewing,
+  toggleFullScreen,
+  handleFullscreenChange,
+  copyByBtn,
+  leaveRoom,
+  handleContinue,
+  joinRoom,
+  shareScreen,
+  stopSharing,
+  showSidePanel,
+  hideSidePanel,
+  handleHostLeft,
+  handleJoinedRoom,
+  handleError,
 } from "./utils.js";
+
+//Variables
 export const socket = io();
 export const STATE = {
   mySocketId: "",
@@ -15,17 +31,11 @@ export const STATE = {
   participants: [],
   localStream: null,
   isHost: false,
+  sidePanel: false,
+  isScreensharing: false,
+  fullscreen: false,
+  joinedRoom: false,
 };
-//hämtar room id från url:en och skickar den till backend
-const { id: roomId } = Qs.parse(location.search, {
-  ignoreQueryPrefix: true,
-});
-const username = document.getElementById("input-username");
-const continueBtn = document.getElementById("button-continue");
-const remember = document.getElementById("ask-again");
-const userMenu = document.getElementById("userMenu");
-const video = document.getElementById("video");
-const shareButton = document.getElementById("share-btn");
 
 export const servers = {
   iceServers: [
@@ -34,130 +44,115 @@ export const servers = {
     },
     {
       urls: "turn:a.relay.metered.ca:80",
-      username: "f6de8d4b9f7bd1de1408b8f3",
-      credential: "FAZrFTuBsCxg3KxA",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
     },
-    // {
-    //   urls: "turn:a.relay.metered.ca:80?transport=tcp",
-    //   username: "f6de8d4b9f7bd1de1408b8f3",
-    //   credential: "FAZrFTuBsCxg3KxA",
-    // },
-    // {
-    //   urls: "turn:a.relay.metered.ca:443",
-    //   username: "f6de8d4b9f7bd1de1408b8f3",
-    //   credential: "FAZrFTuBsCxg3KxA",
-    // },
+    {
+      urls: "turn:a.relay.metered.ca:80?transport=tcp",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
+    },
+    {
+      urls: "turn:a.relay.metered.ca:443",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
+    },
+    {
+      urls: "turn:a.relay.metered.ca:443?transport=tcp",
+      username: "cc347fe19af50ac013cb7699",
+      credential: "4UOGvKP33Mduvlmf",
+    },
   ],
 };
-////////////////////////////////functions //////////////////////////////////
 
-function joinRoom() {
-  if (socket) {
-    socket.emit("joinRoom", { username: STATE.myUsername, roomId });
-  }
-}
+//DOM elements
+const leaveRoomBtn = document.getElementById("leave-room");
+const continueBtn = document.getElementById("button-continue");
+export const username = document.getElementById("input-username");
+export const remember = document.getElementById("ask-again");
+export const video = document.getElementById("video");
+export const shareButton = document.getElementById("share-btn");
+export const sidePanel = document.getElementById("side-panel");
+export const sidePanelBtn = document.getElementById("side-panel-btn");
+export const panelheader = document.getElementById("panel-header");
+export const panelPart = document.getElementById("participants");
+export const modal = document.getElementById("modal");
+export const url = window.location.href;
+export const copyURLElement = document.getElementById("copy-link");
+export const copyURLMessage = document.getElementById("copyMessage");
+export const copyBtn = document.getElementById("copy-btn");
 
-function createPcParticipent() {
-  STATE.participants.map((participant) => {
-    if (participant.socketId === STATE.mySocketId) return;
-    if (STATE.isHost) return createParticipantPeerconnection(participant);
-    if (participant.isHost) return createParticipantConnection(participant);
-  });
-}
+//Functions
 
-function createParticipantPeerConnection(participant) {
-  const peerConnection = new RTCPeerConnection(servers);
-  participant.pc = peerConnection;
-  console.log(participant);
-  if (STATE.localStream) {
-    STATE.localStream.getTracks().forEach((track) => {
-      peerConnection.addTracks(track, STATE.localStream);
-    });
-  }
+// function handleStopScreenShare(socketId) {
+//   if (STATE.isHost) {
+//     video.srcObject = null;
+//     shareButton.innerHTML = "Share Screen";
+//     STATE.isScreensharing = false;
+//   }
+//   if (socketId) {
+//     socket.emit("shareEnded", { target: socketId });
+//   }
+// }
 
-  peerConnection.onnegotiationneeded = () => {
-    if (STATE.isHost) createOffer(participant);
-  };
+function handleShareEnded() {
+  console.log("Share Ended");
+  const target = STATE.participants.find(
+    (participant) => participant.isHost
+  ).socketId;
+  socket.emit("viewing", { target, sender: STATE.mySocketId, viewing: false });
+  video.srcObject = null;
+  video.controls = false;
 }
 
 function init() {
   getStoredUsername();
+  copyURLElement.innerHTML = url;
   if (STATE.myUsername) {
     joinRoom();
   }
-  if (roomId) {
-    copyURL();
-  }
-}
-
-async function shareScreen() {
-  if (STATE.isHost) {
-    await navigator.mediaDevices
-      .getDisplayMedia({ video: true, audio: true })
-      .then((stream) => {
-        STATE.localStream = stream;
-        video.srcObject = STATE.localStream;
-        STATE.participants.map((participant) => {
-          if (participant.pc)
-            STATE.localStream.getTracks().forEach((track) => {
-              participant.pc.addTrack(track, STATE.localStream);
-            });
-
-          console.log(
-            "🚀 ~ file: sharespace.js:101 ~ STATE.participants.map ~ participant:",
-            participant
-          );
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
-}
-
-function handleHostLeft(msg) {
-  alert(msg);
-  window.location.href = "index.html";
 }
 
 //EventListeners
-shareButton.onclick = () => shareScreen();
+leaveRoomBtn.onclick = () => leaveRoom();
 
-continueBtn.onclick = () => {
-  const value = username.value;
-  const dontaskagain = remember.checked;
-
-  if (value !== "" && value !== " ") {
-    STATE.myUsername = value;
-
-    modal.classList.remove("OPEN");
-    modal.classList.add("CLOSED");
-    joinRoom();
-
-    if (dontaskagain) {
-      localStorage.setItem("_SP_username", STATE.myUsername);
-    }
-    if (!dontaskagain) {
-      localStorage.removeItem("_SP_username");
-    }
-    console.log(STATE);
-  } else {
-    alert("please enter your name");
+shareButton.onclick = () => {
+  if (!STATE.isScreensharing) {
+    shareScreen();
+    return;
   }
+  stopSharing();
 };
 
-userMenu.onclick = () => openUserMeny();
+continueBtn.onclick = handleContinue;
+
+copyURLElement.onclick = copyURL;
+
+copyBtn.onclick = copyByBtn;
+
+sidePanelBtn.onclick = () => {
+  if (!STATE.sidePanel) return showSidePanel();
+  hideSidePanel();
+};
+
+video.onclick = toggleFullScreen;
+
+document.addEventListener("fullscreenchange", (e) => handleFullscreenChange(e));
 
 //Socket listeners
 socket.on("socketId", (id) => {
   STATE.mySocketId = id;
 });
+socket.on("roomJoined", (roomJoinedId) => handleJoinedRoom(roomJoinedId));
 socket.on("isHost", (isHost) => handleIsHost(isHost));
 socket.on("participants", (participants) => handleParticipants(participants));
 socket.on("hostLeft", (msg) => handleHostLeft(msg));
 socket.on("offer", (offer) => handleOffer(offer));
 socket.on("answer", (answer) => handleAnswer(answer));
 socket.on("candidate", (candidate) => handleCandidate(candidate));
+socket.on("shareEnded", () => handleShareEnded());
+socket.on("viewing", (payload) => handleParticipantViewing(payload));
 socket.on("error", (error) => handleError(error));
 
+//Initial operations
 init();

@@ -1,29 +1,27 @@
-import { STATE, servers, socket } from "./sharespace.js";
-const modal = document.getElementById("modal");
+import {
+  STATE,
+  remember,
+  servers,
+  socket,
+  username,
+  copyURLElement,
+  copyURLMessage,
+  copyBtn,
+  url,
+  shareButton,
+  sidePanel,
+  sidePanelBtn,
+  panelheader,
+  panelPart,
+} from "./sharespace.js";
 
-export function copyURL() {
-  const url = window.location.href;
-  const copyURLElement = document.getElementById("copy-link");
-  const copyURLMessage = document.getElementById("copyMessage");
-  copyURLElement.innerHTML = url;
+//Variables
 
-  copyURLElement.onclick = () => {
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        copyURLMessage.innerHTML = "URL copied to clipboard 😍";
-        setTimeout(() => {
-          copyURLMessage.innerHTML = "Click to copy link";
-        }, 2000);
-      })
-      .catch((error) => {
-        copyURLMessage.innerHTML = error;
-        setTimeout(() => {
-          copyURLMessage.innerHTML = "Click to copy link";
-        }, 2000);
-      });
-  };
-}
+const { id: roomId } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true,
+});
+
+//Functions
 export function getStoredUsername() {
   try {
     const storedName = localStorage.getItem("_SP_username");
@@ -40,6 +38,23 @@ export function getStoredUsername() {
 export function openUserMeny() {
   modal.classList.remove("CLOSED");
   modal.classList.add("OPEN");
+  username.value = STATE.myUsername;
+  const saved = localStorage.getItem("_SP_username");
+  remember.checked = saved ? true : false;
+}
+
+export function toggleFullScreen() {
+  console.log("Toggle Full Screen");
+  const video = document.getElementById("video");
+  if (!video) return;
+  if (STATE.fullscreen) document.exitFullscreen();
+  video
+    .requestFullscreen({ navigationUI: "show" })
+    .then(() => (STATE.fullscreen = true));
+}
+
+export function handleFullscreenChange(e) {
+  console.log("🚀 ~ file: utils.js:41 ~ handleFullscreenChange ~ e:", e);
 }
 
 export function handleParticipants(participants) {
@@ -51,11 +66,18 @@ export function handleParticipants(participants) {
   //Lägg till nya - ej dubbletter
   participants.forEach((participant) => {
     console.log(participant);
-    const findParticipants = STATE.participants.find(
+    const participantMatch = STATE.participants.find(
       (part) => part.socketId === participant.socketId
     );
 
-    if (findParticipants) return;
+    if (participantMatch) {
+      console.log(participant.username);
+      if (participantMatch.username === participant.username) return;
+      if (participantMatch.username !== participant.username) {
+        participantMatch.username = participant.username;
+        return;
+      }
+    }
     console.log("Adding participant: " + participant.username);
     STATE.participants.push(participant);
   });
@@ -70,7 +92,7 @@ export function handleParticipants(participants) {
   });
 
   //Uppdatera visuella element
-  updateParticipantsList(participants);
+  updateParticipantsList(STATE.participants);
   createPcParticipant();
   console.log(STATE);
 }
@@ -80,9 +102,14 @@ function updateParticipantsList(participants) {
   parentDiv.innerHTML = "";
 
   participants.forEach((participant) => {
+    console.log(
+      "🚀 ~ file: utils.js:105 ~ participants.forEach ~ participant:",
+      participant
+    );
     const participantContainer = document.createElement("div");
     participantContainer.classList.add("container-flex-row");
     participantContainer.classList.add("participant");
+    participantContainer.id = participant.socketId;
 
     const usernameEl = document.createElement("p");
     const hostEl = document.createElement("p");
@@ -96,8 +123,19 @@ function updateParticipantsList(participants) {
     avatar.classList.add("avatar");
     avatar.innerHTML = "👨‍⚕️";
 
+    const eye = document.createElement("div");
+    if (!participant.viewing) eye.classList.add("HIDDEN");
+    eye.classList.add("eye");
+    eye.innerHTML = "Viewing";
+
+    if (participantContainer.id === STATE.mySocketId) {
+      participantContainer.classList.add("me");
+      participantContainer.onclick = () => openUserMeny();
+    }
+
     participantContainer.appendChild(avatar);
     participantContainer.appendChild(usernameEl);
+    participantContainer.appendChild(eye);
     if (participant.isHost) participantContainer.appendChild(hostEl);
     parentDiv.appendChild(participantContainer);
   });
@@ -146,8 +184,42 @@ function createParticipantPeerConnection(participant) {
       "🚀 ~ file: utils.js:130 ~ peerConnection.ontrack ~ event:",
       event
     );
-    if (event.streams[0]) {
+    console.log(
+      "🚀 ~ file: utils.js:160 ~ createParticipantPeerConnection ~ event.streams[0]:",
+      event.streams[0]
+    );
+    if (event.streams[0].active) {
       document.getElementById("video").srcObject = event.streams[0];
+      const video = document.getElementById("video");
+      video.style.backgroundColor = "white";
+      setTimeout(() => {
+        if (video.readyState === 4) {
+          socket.emit("viewing", {
+            target: participant.socketId,
+            sender: STATE.mySocketId,
+            viewing: true,
+          });
+        }
+      }, 3000);
+    }
+  };
+
+  participant.pc.oniceconnectionstatechange = function (event) {
+    console.log("event", event);
+    if (event.srcElement.connectionState === "failed") {
+      socket.emit("error", {
+        target: participant.socketId,
+        msg: "WebRTC connection failed",
+      });
+      // Display an alert when WebRTC fails
+      console.error("WebRTC connection failed!");
+      console.warn(
+        "Sending new offer to ",
+        participant.username,
+        "since connection failed"
+      );
+      // createPartOffer(participant);
+      participant.pc.restartIce();
     }
   };
   console.log(participant.pc);
@@ -174,6 +246,7 @@ function createPartOffer(participant) {
 
 export function handleIsHost(isHost) {
   const shareButton = document.getElementById("share-btn");
+  const info = document.getElementById("info");
   console.log(
     "🚀 ~ file: sharespace.js:131 ~ handleIsHosted ~ isHost:",
     isHost
@@ -181,6 +254,7 @@ export function handleIsHost(isHost) {
 
   if (isHost) {
     STATE.isHost = isHost;
+    info?.classList.add("HIDDEN");
     shareButton.classList.remove("HIDDEN");
   }
 }
@@ -257,4 +331,210 @@ function findTargetPC(target) {
   );
   if (match.pc) return match.pc;
   console.log("Could not find participant PC");
+}
+
+export function handleParticipantViewing({ sender, viewing }) {
+  console.log(
+    "🚀 ~ file: utils.js:271 ~ handleParticipantViewing ~ sender, viewing:",
+    sender,
+    viewing
+  );
+
+  const participantContainer = document.getElementById(sender);
+  // const eyeElement = participantContainer.children.find(child =>
+  // child.classList.contains(className));
+  const eyeElement = participantContainer.querySelector(".eye");
+  if (viewing && eyeElement) {
+    STATE.participants.find((part) => part.socketId === sender).viewing = true;
+    eyeElement.classList.remove("HIDDEN");
+    eyeElement.classList.add("OPEN");
+    return;
+  }
+  if (!viewing && eyeElement) {
+    STATE.participants.find((part) => part.socketId === sender).viewing = false;
+    eyeElement.classList.add("HIDDEN");
+    eyeElement.classList.remove("OPEN");
+
+    return;
+  }
+}
+
+export function copyURL() {
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      copyURLMessage.innerHTML = "URL copied to clipboard 😍";
+      setTimeout(() => {
+        copyURLMessage.innerHTML = " Click the link to copy and share it";
+      }, 2000);
+    })
+    .catch((error) => {
+      copyURLMessage.innerHTML = error;
+      setTimeout(() => {
+        copyURLMessage.innerHTML = "Click the link to copy and share it";
+      }, 2000);
+    });
+}
+
+export function copyByBtn() {
+  navigator.clipboard
+    .writeText(url)
+    .then(() => {
+      copyBtn.innerHTML = "URL copied to clipboard 😍";
+      setTimeout(() => {
+        copyBtn.innerHTML = " Click the link to copy and share it";
+      }, 2000);
+    })
+    .catch((error) => {
+      copyBtn.innerHTML = error;
+      setTimeout(() => {
+        copyBtn.innerHTML = " Click the link to copy and share it";
+      }, 2000);
+    });
+}
+
+export function leaveRoom() {
+  window.location.href = "index.html";
+}
+
+export function handleError(error) {
+  console.log(error.msg);
+  alert(
+    "Something went wrong, please try to reload the page or start a new session"
+  );
+}
+
+export function joinRoom() {
+  if (socket) {
+    socket.emit("joinRoom", { username: STATE.myUsername, roomId });
+  }
+}
+
+export function handleContinue() {
+  const value = username.value;
+  const dontaskagain = remember.checked;
+
+  if (value !== "" && value !== " " && !STATE.joinedRoom) {
+    STATE.myUsername = value;
+
+    modal.classList.remove("OPEN");
+    modal.classList.add("CLOSED");
+    joinRoom();
+
+    if (dontaskagain) {
+      localStorage.setItem("_SP_username", STATE.myUsername);
+    }
+    if (!dontaskagain) {
+      localStorage.removeItem("_SP_username");
+    }
+    console.log(STATE);
+    return;
+  } else if (value !== "" && value !== " " && STATE.joinedRoom) {
+    STATE.myUsername = value;
+    updateUsername(STATE.myUsername);
+    modal.classList.remove("OPEN");
+    modal.classList.add("CLOSED");
+
+    if (dontaskagain) {
+      localStorage.setItem("_SP_username", STATE.myUsername);
+    }
+    if (!dontaskagain) {
+      localStorage.removeItem("_SP_username");
+    }
+    console.log(STATE);
+    return;
+  }
+  alert("please enter your name");
+}
+
+export async function shareScreen() {
+  if (STATE.isHost) {
+    await navigator.mediaDevices
+      .getDisplayMedia({ video: true, audio: true })
+      .then((stream) => {
+        STATE.localStream = stream;
+        video.srcObject = STATE.localStream;
+        STATE.isScreensharing = true;
+        shareButton.innerHTML = "Stop sharing";
+        STATE.participants.map((participant) => {
+          if (participant.pc)
+            STATE.localStream.getTracks().forEach((track) => {
+              track.addEventListener("removetrack", () => {
+                handleStopScreenShare(participant.socketId);
+              });
+              participant.pc.addTrack(track, STATE.localStream);
+            });
+
+          console.log(
+            "🚀 ~ file: sharespace.js:101 ~ STATE.participants.map ~ participant:",
+            participant
+          );
+        });
+        setInterval(() => {
+          if (video.readyState === 2) stopSharing();
+        }, 2000);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+}
+
+export function stopSharing() {
+  if (STATE.localStream) {
+    STATE.localStream.getTracks()[0].stop();
+    console.log(STATE.localStream.getTracks()[0]);
+    STATE.localStream = null;
+    video.srcObject = null;
+    shareButton.innerHTML = "Share Screen";
+
+    STATE.participants.map((participant) => {
+      socket.emit("shareEnded", { target: participant.socketId });
+    });
+  }
+  STATE.isScreensharing = false;
+}
+
+export function showSidePanel() {
+  sidePanel.classList.remove("CLOSED");
+  sidePanel.classList.add("OPEN");
+  sidePanelBtn.classList.remove("CLOSED");
+  sidePanelBtn.classList.add("OPEN");
+  panelheader.classList.remove("CLOSED");
+  panelheader.classList.add("OPEN");
+  panelPart.classList.remove("CLOSED");
+  panelPart.classList.add("OPEN");
+  STATE.sidePanel = true;
+}
+
+export function hideSidePanel() {
+  sidePanel.classList.remove("OPEN");
+  sidePanel.classList.add("CLOSED");
+  sidePanelBtn.classList.remove("OPEN");
+  sidePanelBtn.classList.add("CLOSED");
+  panelheader.classList.remove("OPEN");
+  panelheader.classList.add("CLOSED");
+  panelPart.classList.remove("OPEN");
+  panelPart.classList.add("CLOSED");
+  STATE.sidePanel = false;
+}
+
+export function handleHostLeft(msg) {
+  alert(msg);
+  window.location.href = "index.html";
+}
+
+function updateUsername(newUsername) {
+  if (socket && newUsername && STATE.mySocketId) {
+    socket.emit("username", {
+      username: newUsername,
+      roomId,
+    });
+  }
+}
+
+export function handleJoinedRoom(roomJoinedId) {
+  if (roomId === roomJoinedId) {
+    STATE.joinedRoom = true;
+  }
 }
